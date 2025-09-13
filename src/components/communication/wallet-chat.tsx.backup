@@ -1,0 +1,1011 @@
+import { useState, useRef, useEffect } from 'react';
+import { useWallet } from '@/hooks/use-wallet';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { 
+  MessageCircle, 
+  Send, 
+  Paperclip, 
+  X, 
+  Users, 
+  User,
+  File,
+  Image,
+  Download,
+  MoreVertical,
+  Check,
+  CheckCheck,
+  Clock,
+  FileDown,
+  Forward,
+  Save,
+  Trash2,
+  Wifi,
+  WifiOff
+} from 'lucide-react';
+import { UserProfileModal } from './user-profile-modal';
+
+interface MessageAttachment {
+  name: string;
+  type: string;
+  size: number;
+  data: string; // base64 encoded file data
+}
+
+interface Message {
+  id: string;
+  from: string;
+  to: string;
+  content: string;
+  timestamp: Date;
+  read: boolean;
+  delivered?: boolean;
+  attachment?: MessageAttachment;
+}
+
+interface Conversation {
+  walletAddress: string;
+  lastMessage?: Message;
+  unreadCount: number;
+}
+
+export default function WalletChat() {
+  const { wallet } = useWallet();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [newMessage, setNewMessage] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [wsConnected, setWsConnected] = useState(false);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [newChatAddress, setNewChatAddress] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [contextMenu, setContextMenu] = useState<{
+    show: boolean;
+    x: number;
+    y: number;
+    messageId: string;
+    attachment: MessageAttachment;
+  } | null>(null);
+  const [profileModal, setProfileModal] = useState<{
+    show: boolean;
+    walletAddress: string;
+  }>({ show: false, walletAddress: '' });
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const wsRef = useRef<WebSocket | null>(null);
+
+  const loadExistingConversations = async () => {
+    if (!wallet?.address) return;
+    
+    try {
+      const response = await fetch(`/api/messages?limit=100`);
+      if (response.ok) {
+        const allMessages = await response.json();
+        
+        // Find unique conversation partners
+        const conversationMap = new Map<string, Conversation>();
+        
+        allMessages.forEach((msg: any) => {
+          const otherParty = msg.from === wallet.address ? msg.to : msg.from;
+          
+          if (otherParty !== wallet.address) {
+            const existing = conversationMap.get(otherParty.toLowerCase());
+            const message: Message = {
+              id: msg.id.toString(),
+              from: msg.from,
+              to: msg.to,
+              content: msg.content,
+              timestamp: new Date(msg.timestamp),
+              read: msg.read,
+              delivered: msg.delivered,
+              attachment: msg.attachmentName ? {
+                name: msg.attachmentName,
+                type: msg.attachmentType,
+                size: msg.attachmentSize,
+                data: msg.attachmentData
+              } : undefined
+            };
+            
+            if (!existing || new Date(msg.timestamp) > (existing.lastMessage?.timestamp || new Date(0))) {
+              conversationMap.set(otherParty.toLowerCase(), {
+                walletAddress: otherParty,
+                lastMessage: message,
+                unreadCount: existing?.unreadCount || 0
+              });
+            }
+          }
+        });
+        
+        const conversations = Array.from(conversationMap.values());
+        setConversations(conversations);
+        
+        // Load all messages
+        const formattedMessages: Message[] = allMessages
+          .filter((msg: any) => msg.from === wallet.address || msg.to === wallet.address)
+          .map((msg: any) => ({
+            id: msg.id.toString(),
+            from: msg.from,
+            to: msg.to,
+            content: msg.content,
+            timestamp: new Date(msg.timestamp),
+            read: msg.read,
+            delivered: msg.delivered,
+            attachment: msg.attachmentName ? {
+              name: msg.attachmentName,
+              type: msg.attachmentType,
+              size: msg.attachmentSize,
+              data: msg.attachmentData
+            } : undefined
+          }));
+        
+        setMessages(formattedMessages);
+        console.log(`Loaded ${conversations.length} conversations and ${formattedMessages.length} messages`);
+      }
+    } catch (error) {
+      console.error('Error loading conversations:', error);
+    }
+  };
+
+  // Load conversations on wallet connect
+  useEffect(() => {
+    if (wallet?.address) {
+      loadExistingConversations();
+    }
+  }, [wallet?.address]);
+
+  // WebSocket connection
+  useEffect(() => {
+    if (!wallet?.address) return;
+
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    const ws = new WebSocket(`${protocol}//${host}/ws`);
+    
+    ws.onopen = () => {
+      console.log('WebSocket connected successfully');
+      setWsConnected(true);
+      wsRef.current = ws;
+      // Send authentication message
+      ws.send(JSON.stringify({
+        type: 'authenticate',
+        walletAddress: wallet.address
+      }));
+    };
+
+    ws.onclose = (event) => {
+      console.log('WebSocket disconnected:', event.code, event.reason);
+      setWsConnected(false);
+      wsRef.current = null;
+    };
+    
+    ws.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      setWsConnected(false);
+      wsRef.current = null;
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('WebSocket message received:', data);
+        
+        if (data.type === 'new_message') {
+          const newMessage: Message = {
+            id: data.id || Date.now().toString(),
+            from: data.from,
+            to: data.to,
+            content: data.content,
+            timestamp: new Date(data.timestamp),
+            read: false,
+            delivered: true,
+            attachment: data.attachment
+          };
+          
+          setMessages(prev => [...prev, newMessage]);
+          updateConversations(newMessage);
+          console.log('New message added to conversation:', newMessage);
+        } else if (data.action === 'message_sent') {
+          // Update delivery status for sender
+          setMessages(prev => prev.map(msg => 
+            msg.from === data.from && msg.to === data.to && msg.content === data.content
+              ? { ...msg, delivered: data.delivered, id: data.id }
+              : msg
+          ));
+          console.log('Message delivery status updated:', data.delivered);
+        } else if (data.type === 'authenticated') {
+          console.log('WebSocket authenticated for:', data.walletAddress);
+        }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
+      }
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [wallet?.address]);
+
+  // Auto-scroll to bottom of messages
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Handle file selection
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) { // 10MB limit
+      alert('File size must be less than 10MB');
+      return;
+    }
+
+    setSelectedFile(file);
+
+    // Create preview for images
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFilePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeFile = () => {
+    setSelectedFile(null);
+    setFilePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const sendMessage = async () => {
+    if ((!newMessage.trim() && !selectedFile) || !selectedConversation || !wallet?.address) return;
+
+    let attachment: MessageAttachment | undefined;
+
+    if (selectedFile) {
+      try {
+        const base64Data = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(selectedFile);
+        });
+
+        const base64Content = base64Data.split(',')[1]; // Remove data:image/jpeg;base64, prefix
+
+        attachment = {
+          name: selectedFile.name,
+          type: selectedFile.type,
+          size: selectedFile.size,
+          data: base64Content
+        };
+
+        console.log('File attachment prepared:', { name: selectedFile.name, type: selectedFile.type, size: selectedFile.size });
+      } catch (error) {
+        console.error('Error reading file:', error);
+        return;
+      }
+    }
+
+    await sendMessageWithAttachment(attachment);
+  };
+
+  const sendMessageWithAttachment = async (attachment?: MessageAttachment) => {
+    if (!selectedConversation || !wallet?.address || !wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
+      console.error('Cannot send message: WebSocket not connected');
+      return;
+    }
+
+    const messageData = {
+      type: 'send_message',
+      from: wallet.address,
+      to: selectedConversation,
+      content: newMessage.trim(),
+      timestamp: new Date().toISOString(),
+      attachment
+    };
+
+    try {
+      // Send via WebSocket
+      wsRef.current.send(JSON.stringify(messageData));
+      
+      // Add message to local state immediately for sender
+      const sentMsg: Message = {
+        id: Date.now().toString(),
+        from: wallet.address,
+        to: selectedConversation,
+        content: newMessage.trim(),
+        timestamp: new Date(),
+        read: false,
+        delivered: false,
+        attachment
+      };
+
+      setMessages(prev => [...prev, sentMsg]);
+      updateConversations(sentMsg);
+      setNewMessage('');
+      removeFile();
+      
+      console.log('Message sent via WebSocket to:', selectedConversation);
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  };
+
+  const updateConversations = (message: Message) => {
+    const otherParty = message.from === wallet?.address ? message.to : message.from;
+    
+    setConversations(prev => {
+      const existing = prev.find(c => c.walletAddress === otherParty);
+      if (existing) {
+        return prev.map(c => 
+          c.walletAddress === otherParty 
+            ? { 
+                ...c, 
+                lastMessage: message,
+                unreadCount: message.from === wallet?.address ? c.unreadCount : c.unreadCount + 1
+              }
+            : c
+        );
+      } else {
+        return [...prev, {
+          walletAddress: otherParty,
+          lastMessage: message,
+          unreadCount: message.from === wallet?.address ? 0 : 1
+        }];
+      }
+    });
+  };
+
+  const startNewChat = async () => {
+    if (!newChatAddress.trim()) return;
+    
+    const normalizedAddress = newChatAddress.trim().toLowerCase();
+    
+    if (!normalizedAddress.startsWith('0x') || normalizedAddress.length !== 42) {
+      alert('Please enter a valid wallet address (0x...)');
+      return;
+    }
+
+    const existingConversation = conversations.find(c => 
+      c.walletAddress.toLowerCase() === normalizedAddress
+    );
+
+    if (existingConversation) {
+      setSelectedConversation(existingConversation.walletAddress);
+    } else {
+      const newConversation: Conversation = {
+        walletAddress: normalizedAddress,
+        unreadCount: 0
+      };
+      setConversations(prev => [...prev, newConversation]);
+      setSelectedConversation(normalizedAddress);
+      
+      // Load existing messages for this conversation
+      await loadMessagesForConversation(normalizedAddress);
+    }
+
+    setShowAddUserModal(false);
+    setNewChatAddress('');
+  };
+
+  const loadMessagesForConversation = async (walletAddress: string) => {
+    if (!wallet?.address) return;
+    
+    try {
+      const response = await fetch(`/api/messages?from=${wallet.address}&to=${walletAddress}&limit=50`);
+      if (response.ok) {
+        const messagesData = await response.json();
+        const conversationMessages: Message[] = messagesData.map((msg: any) => ({
+          id: msg.id.toString(),
+          from: msg.from,
+          to: msg.to,
+          content: msg.content,
+          timestamp: new Date(msg.timestamp),
+          read: msg.read,
+          delivered: msg.delivered,
+          attachment: msg.attachmentName ? {
+            name: msg.attachmentName,
+            type: msg.attachmentType,
+            size: msg.attachmentSize,
+            data: msg.attachmentData
+          } : undefined
+        }));
+        
+        setMessages(prev => {
+          const filteredPrev = prev.filter(m => 
+            !((m.from === wallet.address && m.to === walletAddress) || 
+              (m.from === walletAddress && m.to === wallet.address))
+          );
+          return [...filteredPrev, ...conversationMessages];
+        });
+        
+        console.log(`Loaded ${conversationMessages.length} messages for conversation with ${walletAddress}`);
+      }
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    }
+  };
+
+  const getConversationMessages = (conversationAddress: string) => {
+    return messages.filter(msg => 
+      (msg.from === wallet?.address && msg.to === conversationAddress) ||
+      (msg.from === conversationAddress && msg.to === wallet?.address)
+    ).sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+  };
+
+  const markAsRead = (conversationAddress: string) => {
+    setConversations(prev => 
+      prev.map(c => 
+        c.walletAddress === conversationAddress 
+          ? { ...c, unreadCount: 0 }
+          : c
+      )
+    );
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  const formatWalletAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const handleWalletAddressClick = (address: string) => {
+    setProfileModal({ show: true, walletAddress: address });
+  };
+
+  const handleAttachmentContextMenu = (e: React.MouseEvent, messageId: string, attachment: MessageAttachment) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setContextMenu({
+      show: true,
+      x: e.clientX,
+      y: e.clientY,
+      messageId,
+      attachment
+    });
+  };
+
+  const handleDownloadFile = (attachment: MessageAttachment) => {
+    const blob = new Blob([
+      Uint8Array.from(atob(attachment.data), c => c.charCodeAt(0))
+    ], { type: attachment.type });
+    
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = attachment.name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    setContextMenu(null);
+  };
+
+  const handleForwardMessage = (messageId: string, attachment: MessageAttachment) => {
+    // TODO: Implement forward functionality
+    console.log('Forward message:', messageId, attachment);
+    setContextMenu(null);
+  };
+
+  const handleSaveToDocuments = async (messageId: string, attachment: MessageAttachment) => {
+    // TODO: Implement save to documents functionality
+    console.log('Save to documents:', messageId, attachment);
+    setContextMenu(null);
+  };
+
+  const handleDeleteMessage = (messageId: string) => {
+    setMessages(prev => prev.filter(msg => msg.id !== messageId));
+    setContextMenu(null);
+  };
+
+  // Close context menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setContextMenu(null);
+    if (contextMenu?.show) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [contextMenu?.show]);
+
+  if (!wallet?.address) {
+    return (
+      <div className="h-[80vh] sm:h-[600px] flex items-center justify-center border rounded-lg">
+        <div className="text-center">
+          <MessageCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">Wallet Required</h3>
+          <p className="text-muted-foreground">Please create or import a wallet to start messaging</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="h-[80vh] sm:h-[600px] flex flex-col sm:flex-row bg-background border rounded-lg overflow-hidden">
+      {/* Left Sidebar - Conversations List */}
+      <div className="w-full sm:w-80 border-b sm:border-b-0 sm:border-r bg-background flex flex-col">
+        {/* Header */}
+        <div className="p-4 border-b bg-background/95 backdrop-blur">
+          <div className="flex items-center justify-between mb-3">
+            <h1 className="text-xl font-semibold">BlockFinaX Chat</h1>
+            <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
+                {wsConnected ? (
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                ) : (
+                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                )}
+              </div>
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                onClick={() => setShowAddUserModal(true)}
+                className="h-8 w-8 p-0 hover:bg-muted"
+              >
+                <Users className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          
+          {/* Search */}
+          <div className="relative">
+            <Input
+              placeholder="Search conversations..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-8 h-9 bg-muted/50 border-0 focus-visible:ring-1"
+            />
+            <MessageCircle className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          </div>
+        </div>
+
+        {/* Add User Modal */}
+        {showAddUserModal && (
+          <div className="p-4 border-b bg-blue-50 dark:bg-blue-950/20">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium">Start New Conversation</h3>
+                <Button size="sm" variant="ghost" onClick={() => setShowAddUserModal(false)} className="h-6 w-6 p-0">
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <Input
+                placeholder="Enter wallet address (0x...)"
+                value={newChatAddress}
+                onChange={(e) => setNewChatAddress(e.target.value)}
+                className="h-9"
+              />
+              <div className="flex space-x-2">
+                <Button size="sm" onClick={startNewChat} className="h-8 px-3">
+                  Start Chat
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => { setShowAddUserModal(false); setNewChatAddress(''); }} className="h-8 px-3">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Conversations List */}
+        <div className="flex-1 overflow-y-auto">
+          {conversations.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+              <MessageCircle className="h-12 w-12 text-muted-foreground mb-4" />
+              <h3 className="font-medium mb-2">No conversations yet</h3>
+              <p className="text-sm text-muted-foreground mb-4">Start a new conversation to begin messaging</p>
+              <Button onClick={() => setShowAddUserModal(true)} size="sm">
+                <Users className="h-4 w-4 mr-2" />
+                Start Conversation
+              </Button>
+            </div>
+          ) : (
+            <>
+              {conversations
+                .filter(conv => 
+                  !searchTerm || 
+                  conv.walletAddress.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  formatWalletAddress(conv.walletAddress).toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((conversation) => (
+                <div
+                  key={conversation.walletAddress}
+                  className={`p-4 cursor-pointer hover:bg-muted/50 transition-colors border-b border-border/50 ${
+                    selectedConversation === conversation.walletAddress ? 'bg-blue-50 dark:bg-blue-950/20 border-l-4 border-l-blue-500' : ''
+                  }`}
+                  onClick={async () => {
+                    setSelectedConversation(conversation.walletAddress);
+                    markAsRead(conversation.walletAddress);
+                    await loadMessagesForConversation(conversation.walletAddress);
+                  }}
+                >
+                  <div className="flex items-center space-x-3">
+                    {/* Avatar */}
+                    <div className="relative">
+                      <div 
+                        className="w-12 h-12 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer hover:scale-105 transition-transform"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleWalletAddressClick(conversation.walletAddress);
+                        }}
+                        title="View profile"
+                      >
+                        {conversation.walletAddress.slice(2, 4).toUpperCase()}
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-background rounded-full"></div>
+                    </div>
+                    
+                    {/* Conversation Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                        <h3 
+                          className="font-medium text-sm hover:text-blue-600 cursor-pointer transition-colors truncate"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleWalletAddressClick(conversation.walletAddress);
+                          }}
+                          title="View profile"
+                        >
+                          {formatWalletAddress(conversation.walletAddress)}
+                        </h3>
+                        <div className="flex items-center space-x-2 shrink-0">
+                          {conversation.lastMessage && (
+                            <span className="text-xs text-muted-foreground">
+                              {formatTime(conversation.lastMessage.timestamp)}
+                            </span>
+                          )}
+                          {conversation.unreadCount > 0 && (
+                            <div className="w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-medium">
+                              {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {conversation.lastMessage && (
+                        <p className="text-sm text-muted-foreground truncate">
+                          {conversation.lastMessage.from === wallet?.address ? 'You: ' : ''}
+                          {conversation.lastMessage.content}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {selectedConversation ? (
+          <>
+            {/* Chat Header */}
+            <div className="p-4 border-b bg-background/95 backdrop-blur">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="relative">
+                    <div 
+                      className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold cursor-pointer hover:scale-105 transition-transform"
+                      onClick={() => handleWalletAddressClick(selectedConversation)}
+                      title="View profile"
+                    >
+                      {selectedConversation.slice(2, 4).toUpperCase()}
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></div>
+                  </div>
+                  <div>
+                    <h2 
+                      className="font-medium cursor-pointer hover:text-blue-600 transition-colors"
+                      onClick={() => handleWalletAddressClick(selectedConversation)}
+                      title="View profile"
+                    >
+                      {formatWalletAddress(selectedConversation)}
+                    </h2>
+                    <p className="text-sm text-green-600 font-medium">Online</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button size="sm" variant="ghost" className="h-8 w-8 p-0">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/30 dark:bg-gray-900/30">
+              {getConversationMessages(selectedConversation).length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                  <MessageCircle className="h-16 w-16 text-muted-foreground mb-4" />
+                  <h3 className="font-medium mb-2">Start the conversation</h3>
+                  <p className="text-sm text-muted-foreground">Send a message to begin chatting with {formatWalletAddress(selectedConversation)}</p>
+                </div>
+              ) : (
+                getConversationMessages(selectedConversation).map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.from === wallet.address ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`flex items-end space-x-2 ${message.from === wallet.address ? 'flex-row-reverse space-x-reverse' : ''}`}>
+                      {/* Avatar for received messages */}
+                      {message.from !== wallet.address && (
+                        <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                          {message.from.slice(2, 4).toUpperCase()}
+                        </div>
+                      )}
+                      
+                      <div
+                        className={`max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-2 shadow-sm ${
+                          message.from === wallet.address
+                            ? 'bg-blue-500 text-white rounded-br-md'
+                            : 'bg-white dark:bg-gray-800 border rounded-bl-md'
+                        }`}
+                      >
+                        <div className="text-sm leading-relaxed">{message.content}</div>
+                        
+                        {/* File Attachment Display */}
+                        {message.attachment && (
+                          <div 
+                            className={`mt-2 p-2 rounded border cursor-pointer hover:opacity-80 transition-opacity ${
+                              message.from === wallet.address
+                                ? 'border-blue-300 bg-blue-400'
+                                : 'border-gray-300 bg-gray-100'
+                            }`}
+                            onContextMenu={(e) => handleAttachmentContextMenu(e, message.id, message.attachment!)}
+                            onDoubleClick={() => handleDownloadFile(message.attachment!)}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-2 flex-1 min-w-0">
+                                {message.attachment.type.startsWith('image/') ? (
+                                  <Image className="h-4 w-4 flex-shrink-0" />
+                                ) : (
+                                  <File className="h-4 w-4 flex-shrink-0" />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <div className={`text-xs font-medium truncate ${
+                                    message.from === wallet.address ? 'text-blue-50' : 'text-gray-700'
+                                  }`}>
+                                    {message.attachment.name}
+                                  </div>
+                                  <div className={`text-xs ${
+                                    message.from === wallet.address ? 'text-blue-100' : 'text-gray-500'
+                                  }`}>
+                                    {formatFileSize(message.attachment.size)}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="flex space-x-1">
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => handleDownloadFile(message.attachment!)}
+                                  className={`p-1 h-6 w-6 ${
+                                    message.from === wallet.address
+                                      ? 'hover:bg-blue-400 text-blue-50'
+                                      : 'hover:bg-gray-200 text-gray-600'
+                                  }`}
+                                  title="Download file"
+                                >
+                                  <Download className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => handleAttachmentContextMenu(e, message.id, message.attachment!)}
+                                  className={`p-1 h-6 w-6 ${
+                                    message.from === wallet.address
+                                      ? 'hover:bg-blue-400 text-blue-50'
+                                      : 'hover:bg-gray-200 text-gray-600'
+                                  }`}
+                                  title="More options"
+                                >
+                                  <MoreVertical className="h-3 w-3" />
+                                </Button>
+                              </div>
+                            </div>
+                            
+                            {/* Image Preview */}
+                            {message.attachment.type.startsWith('image/') && (
+                              <div className="mt-2">
+                                <img
+                                  src={`data:${message.attachment.type};base64,${message.attachment.data}`}
+                                  alt={message.attachment.name}
+                                  className="max-w-full h-auto rounded border max-h-32 object-cover"
+                                />
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Message timestamp and status */}
+                        <div className={`flex items-center justify-end space-x-1 mt-1 text-xs ${
+                          message.from === wallet.address ? 'text-blue-100' : 'text-muted-foreground'
+                        }`}>
+                          <span>{formatTime(message.timestamp)}</span>
+                          {message.from === wallet.address && (
+                            <>
+                              {message.delivered === false ? (
+                                <Clock className="h-3 w-3 opacity-60" />
+                              ) : message.read ? (
+                                <CheckCheck className="h-3 w-3" />
+                              ) : (
+                                <Check className="h-3 w-3" />
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Message Input */}
+            <div className="p-4 border-t bg-background">
+              {/* File Preview */}
+              {selectedFile && (
+                <div className="mb-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3 min-w-0 flex-1">
+                      {filePreview ? (
+                        <img src={filePreview} alt="Preview" className="w-10 h-10 object-cover rounded-lg shrink-0" />
+                      ) : selectedFile.type.startsWith('image/') ? (
+                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                          <Image className="h-5 w-5 text-blue-600" />
+                        </div>
+                      ) : (
+                        <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                          <File className="h-5 w-5 text-blue-600" />
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium truncate">{selectedFile.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {formatFileSize(selectedFile.size)}
+                        </div>
+                      </div>
+                    </div>
+                    <Button size="sm" variant="ghost" onClick={removeFile} className="h-8 w-8 p-0 shrink-0 hover:bg-red-100 hover:text-red-600">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-end space-x-3">
+                <div className="flex-1 relative">
+                  <Input
+                    placeholder={wsConnected ? "Message..." : "Connecting..."}
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage()}
+                    disabled={!wsConnected}
+                    className="pr-12 h-10 rounded-3xl border-muted-foreground/20 focus-visible:ring-blue-500 bg-muted/50"
+                  />
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={!wsConnected}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0 hover:bg-muted-foreground/10"
+                  >
+                    <Paperclip className="h-4 w-4 text-muted-foreground" />
+                  </Button>
+                </div>
+                <Button 
+                  onClick={sendMessage} 
+                  disabled={(!newMessage.trim() && !selectedFile) || !wsConnected}
+                  size="sm"
+                  className={`h-10 w-10 rounded-full p-0 ${
+                    (!newMessage.trim() && !selectedFile) || !wsConnected 
+                      ? 'bg-muted text-muted-foreground cursor-not-allowed' 
+                      : 'bg-blue-500 hover:bg-blue-600 text-white'
+                  }`}
+                >
+                  <Send className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              {/* Hidden File Input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                onChange={handleFileSelect}
+                accept="image/*,application/pdf,.doc,.docx,.txt,.zip,.rar"
+              />
+              
+              {!wsConnected && (
+                <p className="text-xs text-muted-foreground mt-2 text-center">
+                  Connecting to messaging server...
+                </p>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center bg-gray-50/30 dark:bg-gray-900/30">
+            <div className="text-center max-w-md mx-auto p-8">
+              <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="h-8 w-8 text-blue-600" />
+              </div>
+              <p className="text-muted-foreground mb-4">No conversation selected</p>
+              <Button onClick={() => setShowAddUserModal(true)} variant="outline" size="sm">
+                <Users className="h-4 w-4 mr-2" />
+                New Chat
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Context Menu for File Attachments */}
+      {contextMenu?.show && (
+        <div
+          className="fixed z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 min-w-[160px]"
+          style={{
+            left: contextMenu.x,
+            top: contextMenu.y,
+          }}
+        >
+          <button
+            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+            onClick={() => handleDownloadFile(contextMenu.attachment)}
+          >
+            <FileDown className="h-4 w-4" />
+            <span>Download</span>
+          </button>
+          <button
+            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+            onClick={() => handleForwardMessage(contextMenu.messageId, contextMenu.attachment)}
+          >
+            <Forward className="h-4 w-4" />
+            <span>Forward</span>
+          </button>
+          <button
+            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2"
+            onClick={() => handleSaveToDocuments(contextMenu.messageId, contextMenu.attachment)}
+          >
+            <Save className="h-4 w-4" />
+            <span>Save to Documents</span>
+          </button>
+          <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+          <button
+            className="w-full px-3 py-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center space-x-2 text-red-600 dark:text-red-400"
+            onClick={() => handleDeleteMessage(contextMenu.messageId)}
+          >
+            <Trash2 className="h-4 w-4" />
+            <span>Delete Message</span>
+          </button>
+        </div>
+      )}
+
+      {/* User Profile Modal */}
+      <UserProfileModal
+        walletAddress={profileModal.walletAddress}
+        isOpen={profileModal.show}
+        onClose={() => setProfileModal({ show: false, walletAddress: '' })}
+      />
+    </div>
+  );
+}

@@ -1,0 +1,108 @@
+Build Admin Dashboard for Self-Custody Escrow Platform (Observer Role)
+I need an admin dashboard for BlockFinaX — a self-custody Web3 wallet and escrow platform.
+Users create and manage their own smart contracts.
+The dashboard is read-only and analytics-focused — we cannot control escrows or wallets.
+The purpose is to monitor, track, and understand activity, not intervene.
+
+🔍 Modules to Include:
+1. Dashboard Overview
+Total users (by role: exporter, importer, financier)
+
+Total escrows created
+
+Total escrow value locked (TVL)
+
+Network status (Sepolia or other)
+
+Number of active wallets
+
+2. User Activity Monitor
+Registered user list (wallet address, role)
+
+Last activity time
+
+KYC status (if applicable)
+
+Escrows created / participated in
+
+Referral source (optional)
+
+3. Escrow Analytics
+Escrows created: date, wallet addresses, status
+
+Value of each escrow (ETH or token)
+
+Token used in escrow (USDT, USDC, etc.)
+
+Contract addresses
+
+Filter by time, user, status (active, completed, expired)
+
+4. Transaction Feed (On-chain Logs)
+Real-time feed of:
+
+Escrow created
+
+Funds deposited
+
+Escrow released
+
+Transaction hash + contract event
+
+Link to Etherscan
+
+5. Token Monitoring
+Most used tokens
+
+Token distribution across platform
+
+Total value per token held in user wallets
+
+Add/remove tokens from display list (read-only)
+
+6. Smart Contract Registry
+List of deployed escrow contract addresses
+
+Contract metadata (version, deployer)
+
+Number of active instances
+
+ABI version in use
+
+Contract audit link (optional)
+
+7. KYC & Verification Status
+(only if off-chain services are involved)
+
+View which wallets have verified IDs
+
+Status: Pending / Approved / Failed
+
+View docs (read-only)
+
+8. Admin Controls
+Invite new dashboard viewers or analytics roles
+
+No wallet or escrow override access
+
+Only access logs, metrics, and settings
+
+🧠 Design Notes:
+All actions are read-only (view, export, link to Etherscan)
+
+No buttons for release, override, pause, etc.
+
+Focus on transparency, observability, and analytics
+
+🧩 Tech Stack Notes:
+Use The Graph or custom RPC filters to index smart contract events
+
+UI: React + Tailwind or Chakra UI
+
+Backend (optional): Supabase/Firebase for KYC/user metadata only
+
+Data export via CSV/PDF
+
+🎯 Final Goal:
+A clean, lightweight admin dashboard to observe ecosystem activity without custodial access.
+We track usage, help with off-chain support, and understand user behavior — not control user funds.
