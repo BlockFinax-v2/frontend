@@ -5,49 +5,26 @@
  * Features user analytics, system monitoring, message oversight, and referral tracking.
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Users, 
-  MessageSquare, 
   Gift, 
   Activity,
   TrendingUp,
-  Shield,
-  Database,
   Search,
   Eye,
-  Ban,
   CheckCircle,
   AlertTriangle,
-  BarChart3,
-  UserCheck,
-  Calendar,
   Copy
 } from "lucide-react";
-
-interface AdminStats {
-  totalUsers: number;
-  totalMessages: number;
-  totalReferrals: number;
-  activeUsers24h: number;
-  totalPoints: number;
-  averageMessagesPerUser: number;
-  totalTransactionVolume: string;
-  totalTransactions: number;
-  platformRevenue: string;
-  gasFeeRevenue: string;
-  escrowFees: string;
-  transactionsByType: Record<string, number>;
-  avgTransactionValue: string;
-}
 
 interface UserInfo {
   walletAddress: string;
@@ -99,7 +76,7 @@ export default function AdminDashboard() {
   });
 
   // Fetch recent activity with reduced refresh rate
-  const { data: recentActivity, isLoading: activityLoading } = useQuery({
+  const { data: recentActivity } = useQuery({
     queryKey: ['/api/admin/activity'],
     queryFn: async () => {
       const res = await fetch('/api/admin/activity');

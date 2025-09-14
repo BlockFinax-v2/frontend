@@ -24,7 +24,7 @@ import { SubWalletManager } from '@/components/wallet/sub-wallet-manager';
 import { InvoiceManager } from '@/components/invoices/invoice-manager';
 import { useWallet } from '@/hooks/use-wallet';
 import { Settings, Lock, Download, Upload, Network, FileText, Search, MessageCircle, User, TrendingUp, Shield, CreditCard, Copy, Eye, EyeOff, Gift, Receipt } from 'lucide-react';
-import logoPath from "@/assets/logo.png";
+import { logoPath } from "@/assets";
 import { useToast } from '@/hooks/use-toast';
 import {
   Dialog,

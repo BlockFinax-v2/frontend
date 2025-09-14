@@ -17,7 +17,6 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useWallet } from "@/hooks/use-wallet";
-import { apiRequest } from "@/lib/queryClient";
 import { Copy, Users, Gift, Trophy, Plus, RefreshCw, ArrowLeft } from "lucide-react";
 import { useLocation } from "wouter";
 
@@ -84,7 +83,7 @@ export default function Referrals() {
         description: "Your new referral code has been generated successfully.",
       });
     },
-    onError: (error) => {
+    onError: () => {
       toast({
         title: "Error",
         description: "Failed to create referral code. Please try again.",
@@ -121,23 +120,27 @@ export default function Referrals() {
   }
 
   return (
-    <div className="container mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setLocation('/wallet')}
-            className="sm:hidden h-8 w-8"
-          >
-            <ArrowLeft className="h-4 w-4" />
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto p-4 sm:p-6 space-y-6">
+        {/* Back Button */}
+        <div>
+          <Button variant="ghost" size="sm" onClick={() => setLocation('/wallet')}>
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Wallet
           </Button>
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">Referral System</h1>
-            <p className="text-sm sm:text-base text-muted-foreground">
-              Invite partners and earn 50 points for each successful referral
-            </p>
+        </div>
+
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 mx-auto mb-4 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center">
+            <Gift className="h-10 w-10 text-primary" />
           </div>
+          <h1 className="text-4xl font-bold mb-2 text-gray-900 dark:text-white">
+            Referral System
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto text-lg">
+            Invite partners and earn 50 points for each successful referral
+          </p>
         </div>
       </div>
 

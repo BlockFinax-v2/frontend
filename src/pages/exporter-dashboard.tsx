@@ -18,8 +18,11 @@ import {
   TrendingUp,
   MapPin,
   Clock,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft,
+  Plus
 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function ExporterDashboard() {
   const { wallet } = useWallet();
@@ -38,63 +41,103 @@ export default function ExporterDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-6">
-        {/* Header */}
+        {/* Back Button */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold flex items-center">
-            <Truck className="mr-3 h-8 w-8 text-primary" />
-            Exporter Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your international exports and trade contracts
-          </p>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/role-selection">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Role Selection
+            </Link>
+          </Button>
+        </div>
+
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center">
+                <Truck className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Exporter Dashboard
+                </h1>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
+                  Manage your international exports and trade contracts
+                </p>
+              </div>
+            </div>
+            <Button size="lg" className="hidden md:flex">
+              <Plus className="mr-2 h-5 w-5" />
+              New Contract
+            </Button>
+          </div>
         </div>
 
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Contracts</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Active Contracts
+              </CardTitle>
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {exportContracts?.filter((c: any) => c.status === 'active')?.length || 0}
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                {Array.isArray(exportContracts) ? exportContracts.filter((c: any) => c.status === 'active').length : 0}
               </div>
-              <p className="text-xs text-muted-foreground">
-                +2 from last month
-              </p>
+              <div className="flex items-center text-sm">
+                <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                <span className="text-green-600 dark:text-green-400 font-medium">+2</span>
+                <span className="text-gray-500 dark:text-gray-400 ml-1">from last month</span>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">In Transit</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
+          <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                In Transit
+              </CardTitle>
+              <div className="w-10 h-10 bg-orange-100 dark:bg-orange-900/30 rounded-full flex items-center justify-center">
+                <Package className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {shipments?.filter((s: any) => s.status === 'in_transit')?.length || 0}
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                {Array.isArray(shipments) ? shipments.filter((s: any) => s.status === 'in_transit').length : 0}
               </div>
-              <p className="text-xs text-muted-foreground">
-                3 arriving this week
-              </p>
+              <div className="flex items-center text-sm">
+                <Clock className="h-4 w-4 text-orange-500 mr-1" />
+                <span className="text-orange-600 dark:text-orange-400 font-medium">3</span>
+                <span className="text-gray-500 dark:text-gray-400 ml-1">arriving this week</span>
+              </div>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Revenue (30d)</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+          <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Revenue (30d)
+              </CardTitle>
+              <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center">
+                <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                ${financeStats?.monthlyRevenue || '0'}
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                ${(financeStats as any)?.monthlyRevenue || '0'}
               </div>
-              <p className="text-xs text-muted-foreground">
-                +12.5% from last month
-              </p>
+              <div className="flex items-center text-sm">
+                <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                <span className="text-green-600 dark:text-green-400 font-medium">+12.5%</span>
+                <span className="text-gray-500 dark:text-gray-400 ml-1">from last month</span>
+              </div>
             </CardContent>
           </Card>
 
@@ -132,7 +175,7 @@ export default function ExporterDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {exportContracts?.length ? (
+                  {Array.isArray(exportContracts) && exportContracts.length > 0 ? (
                     exportContracts.map((contract: any) => (
                       <div key={contract.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -144,7 +187,7 @@ export default function ExporterDashboard() {
                           </div>
                           <Badge variant={
                             contract.status === 'active' ? 'default' :
-                            contract.status === 'completed' ? 'success' :
+                            contract.status === 'completed' ? 'outline' :
                             'secondary'
                           }>
                             {contract.status}
@@ -192,7 +235,7 @@ export default function ExporterDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {shipments?.length ? (
+                  {Array.isArray(shipments) && shipments.length > 0 ? (
                     shipments.map((shipment: any) => (
                       <div key={shipment.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -206,7 +249,7 @@ export default function ExporterDashboard() {
                             </p>
                           </div>
                           <Badge variant={
-                            shipment.status === 'delivered' ? 'success' :
+                            shipment.status === 'delivered' ? 'outline' :
                             shipment.status === 'in_transit' ? 'default' :
                             'secondary'
                           }>

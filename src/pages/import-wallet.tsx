@@ -9,9 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 import { useWallet } from '@/hooks/use-wallet';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
-import logoPath from "@/assets/logo.png";
+import { Loader2, Eye, EyeOff, ArrowLeft, Download, Key, AlertTriangle } from 'lucide-react';
+import { logoPath } from "@/assets";
 
 const importWalletSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -71,199 +73,241 @@ export default function ImportWallet() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">
-            <div className="flex items-center justify-center space-x-2 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Link>
+          </Button>
+        </div>
+
+        <Card className="shadow-xl border-0">
+          <CardHeader className="text-center pb-4">
+            <div className="w-16 h-16 mx-auto mb-4 p-2 bg-primary/10 rounded-full flex items-center justify-center">
               <img 
                 src={logoPath} 
                 alt="BlockFinaX Logo" 
-                className="w-8 h-8 object-contain"
+                className="w-12 h-12 object-contain"
               />
-              <span>Import Wallet</span>
             </div>
-          </CardTitle>
-          <p className="text-muted-foreground">
-            Import your existing wallet into BlockFinaX using a seed phrase or private key
-          </p>
-        </CardHeader>
-        
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Wallet Name</Label>
-              <Input
-                id="name"
-                placeholder="Imported Wallet"
-                {...register('name')}
-                className={errors.name ? 'border-destructive' : ''}
-              />
-              {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Import Method</Label>
-              <Tabs value={importType} onValueChange={handleTabChange}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="mnemonic">Seed Phrase</TabsTrigger>
-                  <TabsTrigger value="private_key">Private Key</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="mnemonic" className="space-y-2">
-                  <Label htmlFor="mnemonic">Seed Phrase (12 or 24 words)</Label>
-                  <Textarea
-                    id="mnemonic"
-                    placeholder="Enter your seed phrase separated by spaces"
-                    rows={4}
-                    {...register('mnemonic')}
-                    className={errors.mnemonic ? 'border-destructive' : ''}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Enter your 12 or 24-word recovery phrase separated by spaces
-                  </p>
-                </TabsContent>
-                
-                <TabsContent value="private_key" className="space-y-2">
-                  <Label htmlFor="privateKey">Private Key</Label>
-                  <div className="relative">
-                    <Input
-                      id="privateKey"
-                      type={showPrivateKey ? 'text' : 'password'}
-                      placeholder="0x..."
-                      {...register('privateKey')}
-                      className={errors.privateKey ? 'border-destructive' : ''}
-                    />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-0 top-0 h-full px-3"
-                      onClick={() => setShowPrivateKey(!showPrivateKey)}
-                    >
-                      {showPrivateKey ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Enter your private key (64 characters starting with 0x)
-                  </p>
-                </TabsContent>
-              </Tabs>
-              
-              {errors.mnemonic && importType === 'mnemonic' && (
-                <p className="text-sm text-destructive">{errors.mnemonic.message}</p>
-              )}
-              {errors.privateKey && importType === 'private_key' && (
-                <p className="text-sm text-destructive">{errors.privateKey.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Set Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter a strong password"
-                  {...register('password')}
-                  className={errors.password ? 'border-destructive' : ''}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Confirm your password"
-                  {...register('confirmPassword')}
-                  className={errors.confirmPassword ? 'border-destructive' : ''}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-
-            {/* Security Warning */}
-            <div className="p-3 bg-warning/5 border border-warning/20 rounded-lg">
-              <div className="flex items-start space-x-2">
-                <i className="fas fa-shield-alt text-warning text-sm mt-0.5"></i>
-                <div className="text-sm">
-                  <p className="font-medium text-warning mb-1">Security Notice</p>
-                  <p className="text-muted-foreground text-xs">
-                    Make sure you're in a secure environment. Your seed phrase and private key give full access to your wallet.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={
-                isLoading || 
-                (importType === 'mnemonic' ? !mnemonicValue?.trim() : !privateKeyValue?.trim())
-              }
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Importing...
-                </>
-              ) : (
-                'Import Wallet'
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Don't have a wallet?{' '}
-              <Link href="/create-wallet" className="text-primary hover:underline">
-                Create new wallet
-              </Link>
+            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+              Import Wallet
+            </CardTitle>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
+              Import your existing wallet into BlockFinaX using a seed phrase or private key
             </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardHeader>
+          
+          <CardContent className="pt-0">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium">
+                  Wallet Name
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="e.g., My Imported Wallet"
+                  {...register('name')}
+                  className={`h-11 ${errors.name ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                />
+                {errors.name && (
+                  <p className="text-sm text-destructive flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <Label className="text-sm font-medium">Import Method</Label>
+                <Tabs value={importType} onValueChange={handleTabChange} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="mnemonic" className="flex items-center space-x-2">
+                      <Download className="h-4 w-4" />
+                      <span>Seed Phrase</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="private_key" className="flex items-center space-x-2">
+                      <Key className="h-4 w-4" />
+                      <span>Private Key</span>
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="mnemonic" className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="mnemonic" className="text-sm font-medium">
+                        Seed Phrase
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          12-24 words
+                        </Badge>
+                      </Label>
+                      <Textarea
+                        id="mnemonic"
+                        placeholder="Enter your 12-24 word seed phrase separated by spaces"
+                        className={`min-h-[100px] resize-none ${errors.mnemonic ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                        {...register('mnemonic')}
+                      />
+                      {errors.mnemonic && (
+                        <p className="text-sm text-destructive flex items-center">
+                          <AlertTriangle className="h-4 w-4 mr-1" />
+                          {errors.mnemonic.message}
+                        </p>
+                      )}
+                      <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
+                        <AlertDescription className="text-blue-800 dark:text-blue-200 text-sm">
+                          Enter each word separated by a single space. Make sure the order is correct.
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  </TabsContent>
+                  
+                  <TabsContent value="private_key" className="space-y-4 mt-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="privateKey" className="text-sm font-medium">
+                        Private Key
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          Hex format
+                        </Badge>
+                      </Label>
+                      <div className="relative">
+                        <Input
+                          id="privateKey"
+                          type={showPrivateKey ? 'text' : 'password'}
+                          placeholder="Enter your private key (0x...)"
+                          className={`h-11 pr-10 ${errors.privateKey ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                          {...register('privateKey')}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-2 top-1.5 h-8 w-8 p-0"
+                          onClick={() => setShowPrivateKey(!showPrivateKey)}
+                        >
+                          {showPrivateKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </Button>
+                      </div>
+                      {errors.privateKey && (
+                        <p className="text-sm text-destructive flex items-center">
+                          <AlertTriangle className="h-4 w-4 mr-1" />
+                          {errors.privateKey.message}
+                        </p>
+                      )}
+                      <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950 dark:border-amber-800">
+                        <AlertDescription className="text-amber-800 dark:text-amber-200 text-sm">
+                          Private keys should start with "0x" followed by 64 hexadecimal characters.
+                        </AlertDescription>
+                      </Alert>
+                    </div>
+                  </TabsContent>
+                </Tabs>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">
+                  New Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter a strong password"
+                    {...register('password')}
+                    className={`h-11 pr-10 ${errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1.5 h-8 w-8 p-0"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-destructive flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                  Confirm Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Confirm your password"
+                    {...register('confirmPassword')}
+                    className={`h-11 pr-10 ${errors.confirmPassword ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-2 top-1.5 h-8 w-8 p-0"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-sm text-destructive flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
+
+              {/* Enhanced Security Warning */}
+              <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription className="text-amber-800 dark:text-amber-200">
+                  <strong>Security Notice:</strong> Make sure you're in a secure environment. Your seed phrase and private key give full access to your wallet.
+                </AlertDescription>
+              </Alert>
+
+              <Button 
+                type="submit" 
+                disabled={
+                  isLoading || 
+                  (importType === 'mnemonic' ? !mnemonicValue?.trim() : !privateKeyValue?.trim())
+                }
+                className="w-full h-11 text-base font-medium"
+                size="lg"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Importing Wallet...
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-4 w-4" />
+                    Import Wallet
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Don't have a wallet yet?{' '}
+                <Link href="/create-wallet" className="text-primary hover:underline font-medium">
+                  Create new wallet
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

@@ -18,8 +18,11 @@ import {
   PieChart,
   Target,
   Clock,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft,
+  Plus
 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function FinancierDashboard() {
   const { wallet } = useWallet();
@@ -42,17 +45,39 @@ export default function FinancierDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 to-green-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-6">
-        {/* Header */}
+        {/* Back Button */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold flex items-center">
-            <Banknote className="mr-3 h-8 w-8 text-primary" />
-            Financier Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your trade finance investments and funding pools
-          </p>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/role-selection">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Role Selection
+            </Link>
+          </Button>
+        </div>
+
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center">
+                <Banknote className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Financier Dashboard
+                </h1>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
+                  Manage funding pools and track investment performance
+                </p>
+              </div>
+            </div>
+            <Button size="lg" className="hidden md:flex">
+              <Plus className="mr-2 h-5 w-5" />
+              Create Pool
+            </Button>
+          </div>
         </div>
 
         {/* Stats Overview */}
@@ -64,10 +89,10 @@ export default function FinancierDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ${performance?.totalDeployed || '0'}
+                ${(performance as any)?.totalDeployed || '0'}
               </div>
               <p className="text-xs text-muted-foreground">
-                Across {fundingPools?.length || 0} pools
+                Across {Array.isArray(fundingPools) ? fundingPools.length : 0} pools
               </p>
             </CardContent>
           </Card>
@@ -79,7 +104,7 @@ export default function FinancierDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {performance?.monthlyReturn || '0'}%
+                {(performance as any)?.monthlyReturn || '0'}%
               </div>
               <p className="text-xs text-muted-foreground">
                 +2.1% from last month
@@ -94,7 +119,7 @@ export default function FinancierDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {investments?.filter((i: any) => i.status === 'active')?.length || 0}
+                {Array.isArray(investments) ? investments.filter((i: any) => i.status === 'active').length : 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 $2.1M total value
@@ -136,7 +161,7 @@ export default function FinancierDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {fundingPools?.length ? (
+                  {Array.isArray(fundingPools) && fundingPools.length > 0 ? (
                     fundingPools.map((pool: any) => (
                       <div key={pool.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -211,7 +236,7 @@ export default function FinancierDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {opportunities?.length ? (
+                  {Array.isArray(opportunities) && opportunities.length > 0 ? (
                     opportunities.map((opportunity: any) => (
                       <div key={opportunity.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -295,7 +320,7 @@ export default function FinancierDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {investments?.length ? (
+                  {Array.isArray(investments) && investments.length > 0 ? (
                     investments.map((investment: any) => (
                       <div key={investment.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -377,20 +402,20 @@ export default function FinancierDashboard() {
                       <div className="space-y-3">
                         <div className="flex justify-between">
                           <span className="text-sm">Total Capital:</span>
-                          <span className="font-medium">${performance?.totalCapital || '0'}</span>
+                          <span className="font-medium">${(performance as any)?.totalCapital || '0'}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm">Deployed Capital:</span>
-                          <span className="font-medium">${performance?.deployedCapital || '0'}</span>
+                          <span className="font-medium">${(performance as any)?.deployedCapital || '0'}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm">Available:</span>
-                          <span className="font-medium">${performance?.availableCapital || '0'}</span>
+                          <span className="font-medium">${(performance as any)?.availableCapital || '0'}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm">Total Returns:</span>
                           <span className="font-medium text-green-600">
-                            +${performance?.totalReturns || '0'}
+                            +${(performance as any)?.totalReturns || '0'}
                           </span>
                         </div>
                       </div>

@@ -17,9 +17,11 @@ import {
   Clock, 
   AlertTriangle,
   CheckCircle,
-  XCircle,
-  Eye
+  Eye,
+  ArrowLeft,
+  Plus
 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function ArbitratorDashboard() {
   const { wallet } = useWallet();
@@ -38,17 +40,39 @@ export default function ArbitratorDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-6">
-        {/* Header */}
+        {/* Back Button */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold flex items-center">
-            <Scale className="mr-3 h-8 w-8 text-primary" />
-            Arbitrator Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Resolve trade disputes and maintain platform integrity
-          </p>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/role-selection">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Role Selection
+            </Link>
+          </Button>
+        </div>
+
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center">
+                <Scale className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Arbitrator Dashboard
+                </h1>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
+                  Resolve trade disputes and maintain platform integrity
+                </p>
+              </div>
+            </div>
+            <Button size="lg" className="hidden md:flex">
+              <Plus className="mr-2 h-5 w-5" />
+              Apply for Case
+            </Button>
+          </div>
         </div>
 
         {/* Stats Overview */}
@@ -60,7 +84,7 @@ export default function ArbitratorDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {disputes?.filter((d: any) => d.status === 'pending')?.length || 0}
+                {Array.isArray(disputes) ? disputes.filter((d: any) => d.status === 'pending').length : 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 Awaiting your review
@@ -75,10 +99,10 @@ export default function ArbitratorDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {stats?.totalResolved || 0}
+                {(stats as any)?.totalResolved || 0}
               </div>
               <p className="text-xs text-muted-foreground">
-                This month: {stats?.monthlyResolved || 0}
+                This month: {(stats as any)?.monthlyResolved || 0}
               </p>
             </CardContent>
           </Card>
@@ -90,7 +114,7 @@ export default function ArbitratorDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ${earnings?.monthly || '0'}
+                ${(earnings as any)?.monthly || '0'}
               </div>
               <p className="text-xs text-muted-foreground">
                 +15.2% from last month
@@ -132,7 +156,7 @@ export default function ArbitratorDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {disputes?.filter((d: any) => d.status === 'pending')?.length ? (
+                  {Array.isArray(disputes) && disputes.filter((d: any) => d.status === 'pending').length > 0 ? (
                     disputes.filter((d: any) => d.status === 'pending').map((dispute: any) => (
                       <div key={dispute.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -212,7 +236,7 @@ export default function ArbitratorDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {disputes?.filter((d: any) => d.status === 'resolved')?.length ? (
+                  {Array.isArray(disputes) && disputes.filter((d: any) => d.status === 'resolved').length > 0 ? (
                     disputes.filter((d: any) => d.status === 'resolved').map((dispute: any) => (
                       <div key={dispute.id} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -280,11 +304,11 @@ export default function ArbitratorDashboard() {
                       <div className="space-y-3">
                         <div className="flex justify-between">
                           <span className="text-sm">Cases Resolved:</span>
-                          <span className="font-medium">{stats?.totalResolved || 0}</span>
+                          <span className="font-medium">{(stats as any)?.totalResolved || 0}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm">Average Resolution Time:</span>
-                          <span className="font-medium">{stats?.avgResolutionTime || '0'} hours</span>
+                          <span className="font-medium">{(stats as any)?.avgResolutionTime || '0'} hours</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm">Success Rate:</span>
@@ -358,19 +382,19 @@ export default function ArbitratorDashboard() {
                       <div className="space-y-3">
                         <div className="flex justify-between">
                           <span className="text-sm">This Month:</span>
-                          <span className="font-medium">${earnings?.monthly || '0'}</span>
+                          <span className="font-medium">${(earnings as any)?.monthly || '0'}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm">Total Earned:</span>
-                          <span className="font-medium">${earnings?.total || '0'}</span>
+                          <span className="font-medium">${(earnings as any)?.total || '0'}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm">Average per Case:</span>
-                          <span className="font-medium">${earnings?.averagePerCase || '0'}</span>
+                          <span className="font-medium">${(earnings as any)?.averagePerCase || '0'}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-sm">Pending Payments:</span>
-                          <span className="font-medium">${earnings?.pending || '0'}</span>
+                          <span className="font-medium">${(earnings as any)?.pending || '0'}</span>
                         </div>
                       </div>
                     </div>

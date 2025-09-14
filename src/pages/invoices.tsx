@@ -8,9 +8,11 @@
 import { useWallet } from "@/hooks/use-wallet";
 import { InvoiceManager } from "@/components/invoices/invoice-manager";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, DollarSign, Clock, TrendingUp } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { FileText, DollarSign, Clock, TrendingUp, ArrowLeft, Receipt, AlertCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
+import { Link } from "wouter";
 
 export default function Invoices() {
   const { wallet } = useWallet();
@@ -45,35 +47,72 @@ export default function Invoices() {
 
   if (!wallet) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Wallet Required</h1>
-          <p className="text-muted-foreground">Please unlock your wallet to access invoices.</p>
-        </div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md mx-4 shadow-xl border-0">
+          <CardContent className="pt-8 pb-6">
+            <div className="text-center space-y-4">
+              <div className="w-16 h-16 mx-auto p-2 bg-primary/10 rounded-full flex items-center justify-center">
+                <AlertCircle className="h-10 w-10 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
+                  Wallet Required
+                </h1>
+                <p className="text-gray-600 dark:text-gray-300">
+                  Please unlock your wallet to access invoices.
+                </p>
+              </div>
+              <Button asChild className="w-full">
+                <Link href="/unlock-wallet">Unlock Wallet</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background p-4">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-7xl mx-auto p-6 space-y-8">
+        {/* Back Button */}
+        <div>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/wallet">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Wallet
+            </Link>
+          </Button>
+        </div>
+
         {/* Header */}
-        <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Smart Invoices</h1>
-          <p className="text-muted-foreground">
+        <div className="text-center">
+          <div className="w-20 h-20 mx-auto mb-4 p-3 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center">
+            <Receipt className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-4xl font-bold tracking-tight mb-2 text-gray-900 dark:text-white">
+            Smart Invoices
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 text-lg max-w-2xl mx-auto">
             Create, send, and manage invoices with automated crypto payments
           </p>
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Sent</CardTitle>
-              <FileText className="h-4 w-4 text-muted-foreground" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="shadow-lg border-0 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                Total Sent
+              </CardTitle>
+              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{sentStats.total}</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
+                {sentStats.total}
+              </div>
               <p className="text-xs text-muted-foreground">
                 {sentStats.paid} paid, {sentStats.overdue} overdue
               </p>

@@ -18,8 +18,10 @@ import {
   Search,
   Shield,
   Clock,
-  Star
+  Star,
+  ArrowLeft
 } from "lucide-react";
+import { Link } from "wouter";
 
 export default function ImporterDashboard() {
   const { wallet } = useWallet();
@@ -38,17 +40,39 @@ export default function ImporterDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 py-6">
-        {/* Header */}
+        {/* Back Button */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold flex items-center">
-            <Building2 className="mr-3 h-8 w-8 text-primary" />
-            Importer Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            Source products globally with secure payment guarantees
-          </p>
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/role-selection">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Role Selection
+            </Link>
+          </Button>
+        </div>
+
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="w-16 h-16 bg-white dark:bg-gray-800 rounded-full shadow-lg flex items-center justify-center">
+                <Building2 className="h-8 w-8 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                  Importer Dashboard
+                </h1>
+                <p className="text-gray-600 dark:text-gray-300 mt-1">
+                  Source products globally with secure payment guarantees
+                </p>
+              </div>
+            </div>
+            <Button size="lg" className="hidden md:flex">
+              <Search className="mr-2 h-5 w-5" />
+              Find Suppliers
+            </Button>
+          </div>
         </div>
 
         {/* Stats Overview */}
@@ -60,7 +84,7 @@ export default function ImporterDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {orders?.filter((o: any) => o.status === 'active')?.length || 0}
+                {Array.isArray(orders) ? orders.filter((o: any) => o.status === 'active').length : 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 +5 from last month
@@ -75,7 +99,7 @@ export default function ImporterDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {suppliers?.filter((s: any) => s.verified)?.length || 0}
+                {Array.isArray(suppliers) ? suppliers.filter((s: any) => s.verified).length : 0}
               </div>
               <p className="text-xs text-muted-foreground">
                 98% KYC completion
@@ -90,7 +114,7 @@ export default function ImporterDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ${orders?.reduce((sum: number, o: any) => sum + (o.value || 0), 0) || '0'}
+                ${Array.isArray(orders) ? orders.reduce((sum: number, o: any) => sum + (o.value || 0), 0) : '0'}
               </div>
               <p className="text-xs text-muted-foreground">
                 +8.2% from last month
@@ -132,7 +156,7 @@ export default function ImporterDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {suppliers?.length ? (
+                  {Array.isArray(suppliers) && suppliers.length > 0 ? (
                     suppliers.map((supplier: any, index: number) => (
                       <div key={supplier.id || `supplier-${index}`} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -198,7 +222,7 @@ export default function ImporterDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {orders?.length ? (
+                  {Array.isArray(orders) && orders.length > 0 ? (
                     orders.map((order: any, index: number) => (
                       <div key={order.id || `order-${index}`} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">
@@ -259,7 +283,7 @@ export default function ImporterDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {importContracts?.length ? (
+                  {Array.isArray(importContracts) && importContracts.length > 0 ? (
                     importContracts.map((contract: any, index: number) => (
                       <div key={contract.id || `contract-${index}`} className="border rounded-lg p-4">
                         <div className="flex justify-between items-start mb-3">

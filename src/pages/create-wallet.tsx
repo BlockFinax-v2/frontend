@@ -8,11 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useWallet } from '@/hooks/use-wallet';
 import { walletManager } from '@/lib/wallet';
-import { Loader2, Eye, EyeOff, Copy, Check } from 'lucide-react';
+import { Loader2, Eye, EyeOff, Copy, Check, ArrowLeft, ArrowRight, Shield, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import logoPath from "@/assets/logo.png";
+import { logoPath } from "@/assets";
 
 const createWalletSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
@@ -66,7 +68,7 @@ export default function CreateWallet() {
     setVerificationInput(new Array(3).fill(''));
   };
 
-  const onSubmit = async (data: CreateWalletFormData) => {
+  const onSubmit = async (_data: CreateWalletFormData) => {
     if (!acceptTerms) {
       toast({
         variant: "destructive",
@@ -288,135 +290,171 @@ export default function CreateWallet() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">
-            <div className="flex items-center justify-center space-x-2 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Home
+            </Link>
+          </Button>
+        </div>
+
+        <Card className="shadow-xl border-0">
+          <CardHeader className="text-center pb-4">
+            <div className="w-16 h-16 mx-auto mb-4 p-2 bg-primary/10 rounded-full flex items-center justify-center">
               <img 
                 src={logoPath} 
                 alt="BlockFinaX Logo" 
-                className="w-8 h-8 object-contain"
+                className="w-12 h-12 object-contain"
               />
-              <span>Create New Wallet</span>
             </div>
-          </CardTitle>
-          <p className="text-muted-foreground">
-            Create a new BlockFinaX wallet to get started with trade finance
-          </p>
-        </CardHeader>
-        
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Wallet Name</Label>
-              <Input
-                id="name"
-                placeholder="My Wallet"
-                {...register('name')}
-                className={errors.name ? 'border-destructive' : ''}
-              />
-              {errors.name && (
-                <p className="text-sm text-destructive">{errors.name.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="Enter a strong password"
-                  {...register('password')}
-                  className={errors.password ? 'border-destructive' : ''}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              {errors.password && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Confirm your password"
-                  {...register('confirmPassword')}
-                  className={errors.confirmPassword ? 'border-destructive' : ''}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-full px-3"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                >
-                  {showConfirmPassword ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-              {errors.confirmPassword && (
-                <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="acceptTerms"
-                checked={acceptTerms}
-                onCheckedChange={(checked) => setAcceptTerms(checked === true)}
-              />
-              <Label htmlFor="acceptTerms" className="text-sm">
-                I understand that I am responsible for saving my seed phrase and that it cannot be recovered
-              </Label>
-            </div>
-
-
-            <Button 
-              type="submit" 
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Creating...
-                </>
-              ) : (
-                'Create Wallet'
-              )}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Already have a wallet?{' '}
-              <Link href="/import-wallet" className="text-primary hover:underline">
-                Import existing wallet
-              </Link>
+            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+              Create New Wallet
+            </CardTitle>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">
+              Create a secure BlockFinaX wallet to get started with trade finance
             </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardHeader>
+          
+          <CardContent className="pt-0">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium">
+                  Wallet Name
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="e.g., My Trade Finance Wallet"
+                  {...register('name')}
+                  className={`h-11 ${errors.name ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                />
+                {errors.name && (
+                  <p className="text-sm text-destructive flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    {errors.name.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password" className="text-sm font-medium">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Enter a strong password"
+                    {...register('password')}
+                    className={`h-11 pr-10 ${errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+                {errors.password && (
+                  <p className="text-sm text-destructive flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                  Confirm Password
+                </Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Confirm your password"
+                    {...register('confirmPassword')}
+                    className={`h-11 pr-10 ${errors.confirmPassword ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="absolute right-0 top-0 h-full px-3"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+                {errors.confirmPassword && (
+                  <p className="text-sm text-destructive flex items-center">
+                    <AlertTriangle className="h-4 w-4 mr-1" />
+                    {errors.confirmPassword.message}
+                  </p>
+                )}
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
+                  <Shield className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  <AlertDescription className="text-amber-800 dark:text-amber-200">
+                    <span className="font-semibold">Security Notice:</span> Your wallet will be encrypted with this password. 
+                    Make sure to remember it as it cannot be recovered.
+                  </AlertDescription>
+                </Alert>
+
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="terms"
+                    checked={acceptTerms}
+                    onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                    className="mt-0.5"
+                  />
+                  <Label htmlFor="terms" className="text-sm leading-relaxed cursor-pointer">
+                    I understand that I am responsible for securely storing my wallet password and seed phrase. 
+                    I acknowledge that BlockFinaX cannot recover my wallet if I lose this information.
+                  </Label>
+                </div>
+              </div>
+
+              <Button 
+                type="submit" 
+                disabled={isLoading || !acceptTerms} 
+                className="w-full h-11 text-base font-medium"
+                size="lg"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating Wallet...
+                  </>
+                ) : (
+                  <>
+                    Create Wallet
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </>
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Already have a wallet?{' '}
+                <Link href="/import-wallet" className="text-primary hover:underline font-medium">
+                  Import existing wallet
+                </Link>
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
