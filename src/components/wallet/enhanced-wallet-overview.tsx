@@ -88,7 +88,7 @@ export function EnhancedWalletOverview({ selectedNetworkId, className = '', onTa
     return (
       <div className={`space-y-6 ${className}`}>
         <Card className="overflow-hidden">
-          <div className="wallet-gradient p-6 text-white">
+          <div className="wallet-gradient p-6 text-black">
             <div className="flex justify-between items-start mb-6">
               <div>
                 <Skeleton className="h-6 w-32 mb-2 bg-white/20" />
@@ -110,13 +110,13 @@ export function EnhancedWalletOverview({ selectedNetworkId, className = '', onTa
     <div className={`space-y-6 ${className}`}>
       {/* Enhanced Portfolio Card */}
       <Card className="overflow-hidden">
-        <div className="wallet-gradient p-4 sm:p-6 text-white">
+        <div className="wallet-gradient p-4 sm:p-6 text-black">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 sm:mb-6">
             <div className="mb-3 sm:mb-0 flex-1">
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-lg sm:text-xl font-semibold">Portfolio Balance</h2>
                 <Select value={walletType} onValueChange={(value: 'crypto' | 'fiat') => setWalletType(value)}>
-                  <SelectTrigger className="w-40 bg-white/10 border-white/20 text-white">
+                  <SelectTrigger className="w-40 bg-white/10 border-white/20 text-black">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -135,7 +135,7 @@ export function EnhancedWalletOverview({ selectedNetworkId, className = '', onTa
                   </SelectContent>
                 </Select>
               </div>
-              <p className="text-white/80 text-sm">
+              <p className="text-black/80 text-sm">
                 {walletType === 'crypto' ? 'Base Sepolia Network' : 'Traditional Banking'}
               </p>
             </div>
@@ -143,7 +143,7 @@ export function EnhancedWalletOverview({ selectedNetworkId, className = '', onTa
               variant="ghost"
               size="icon"
               onClick={refreshAll}
-              className="self-start sm:self-auto shrink-0 text-white hover:bg-white/20"
+              className="self-start sm:self-auto shrink-0 text-black hover:bg-white/20"
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
@@ -167,7 +167,7 @@ export function EnhancedWalletOverview({ selectedNetworkId, className = '', onTa
                   {portfolioChange.percentage}% (24h)
                 </span>
               </div>
-              <span className="text-white/60 text-sm">
+              <span className="text-black/60 text-sm">
                 {portfolioChange.isPositive ? '+' : '-'}
                 {formatCurrency(Math.abs(portfolioChange.value))}
               </span>
@@ -178,7 +178,7 @@ export function EnhancedWalletOverview({ selectedNetworkId, className = '', onTa
           {address && (
             <div className="flex items-center space-x-3 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
               <Avatar className="h-10 w-10">
-                <AvatarFallback className="wallet-gradient text-white font-medium text-sm">
+                <AvatarFallback className="wallet-gradient text-black font-medium text-sm">
                   {walletType === 'crypto' ? address.slice(2, 4).toUpperCase() : 'FB'}
                 </AvatarFallback>
               </Avatar>
@@ -186,7 +186,7 @@ export function EnhancedWalletOverview({ selectedNetworkId, className = '', onTa
                 <div className="font-medium">
                   {walletType === 'crypto' ? 'Crypto Account' : 'Fiat Account'}
                 </div>
-                <div className="text-sm text-white/80 font-mono">
+                <div className="text-sm text-black/80 font-mono">
                   {walletType === 'crypto' ? formatAddress(address) : '****1234 • ****5678'}
                 </div>
               </div>
@@ -194,7 +194,7 @@ export function EnhancedWalletOverview({ selectedNetworkId, className = '', onTa
                 variant="ghost"
                 size="icon"
                 onClick={() => navigator.clipboard.writeText(walletType === 'crypto' ? address : 'Account: ****1234, ****5678')}
-                className="shrink-0 text-white hover:bg-white/20"
+                className="shrink-0 text-black hover:bg-white/20"
               >
                 <i className="fas fa-copy text-sm"></i>
               </Button>

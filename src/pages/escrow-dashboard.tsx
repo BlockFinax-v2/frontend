@@ -160,409 +160,577 @@ export default function EscrowDashboard() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">BlockFinaX Admin Dashboard</h1>
-          <p className="text-muted-foreground">
-            Self-Custody Escrow Platform Monitoring & Analytics
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="container mx-auto p-6 space-y-8">
+        {/* Header */}
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-blue-500/10 rounded-2xl blur-xl"></div>
+          <div className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 rounded-2xl p-8">
+            <div className="flex items-center justify-between">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl">
+                    <Shield className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                      BlockFinaX Admin Dashboard
+                    </h1>
+                    <p className="text-slate-400 text-lg">
+                      Self-Custody Escrow Platform Monitoring & Analytics
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 px-4 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                  <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20">
+                    <Globe className="h-3 w-3 mr-1" />
+                    {stats?.networkStatus || 'Sepolia Testnet'}
+                  </Badge>
+                </div>
+                <Button variant="outline" size="sm" className="bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 text-slate-300">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Data
+                </Button>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="flex items-center space-x-2">
-          <Badge variant="default">
-            <Globe className="h-3 w-3 mr-1" />
-            {stats?.networkStatus || 'Sepolia Testnet'}
-          </Badge>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export Data
-          </Button>
-        </div>
-      </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-9">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="escrows">Escrows</TabsTrigger>
-          <TabsTrigger value="transactions">Feed</TabsTrigger>
-          <TabsTrigger value="tokens">Tokens</TabsTrigger>
-          <TabsTrigger value="contracts">Contracts</TabsTrigger>
-          <TabsTrigger value="finance">Finance Pools</TabsTrigger>
-          <TabsTrigger value="referrals">Referrals</TabsTrigger>
-          <TabsTrigger value="kyc">KYC</TabsTrigger>
+      <Tabs defaultValue="overview" className="space-y-8">
+        <TabsList className="grid w-full grid-cols-9 bg-slate-800/50 border border-slate-700/50 backdrop-blur-sm p-1 rounded-xl">
+          <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">Overview</TabsTrigger>
+          <TabsTrigger value="users" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">Users</TabsTrigger>
+          <TabsTrigger value="escrows" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">Escrows</TabsTrigger>
+          <TabsTrigger value="transactions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">Feed</TabsTrigger>
+          <TabsTrigger value="tokens" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">Tokens</TabsTrigger>
+          <TabsTrigger value="contracts" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">Contracts</TabsTrigger>
+          <TabsTrigger value="finance" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">Finance</TabsTrigger>
+          <TabsTrigger value="referrals" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">Referrals</TabsTrigger>
+          <TabsTrigger value="kyc" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">KYC</TabsTrigger>
         </TabsList>
 
         {/* Dashboard Overview */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Users</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats?.totalUsers || 0}</div>
-                <div className="text-xs text-muted-foreground space-y-1">
-                  <div>Exporters: {stats?.usersByRole?.exporters || 0}</div>
-                  <div>Importers: {stats?.usersByRole?.importers || 0}</div>
-                  <div>Financiers: {stats?.usersByRole?.financiers || 0}</div>
-                </div>
-              </CardContent>
-            </Card>
+        <TabsContent value="overview" className="space-y-8">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 hover:border-emerald-500/50 transition-all duration-300">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-slate-300">Total Users</CardTitle>
+                  <div className="p-2 bg-emerald-500/10 rounded-lg">
+                    <Users className="h-4 w-4 text-emerald-400" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white mb-2">{stats?.totalUsers || 0}</div>
+                  <div className="text-xs text-slate-400 space-y-1">
+                    <div className="flex justify-between">
+                      <span>Exporters:</span>
+                      <span className="text-emerald-400">{stats?.usersByRole?.exporters || 0}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Importers:</span>
+                      <span className="text-cyan-400">{stats?.usersByRole?.importers || 0}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Financiers:</span>
+                      <span className="text-blue-400">{stats?.usersByRole?.financiers || 0}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Escrows</CardTitle>
-                <Shield className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats?.totalEscrows || 0}</div>
-                <div className="text-xs text-muted-foreground">
-                  <div>Active: {stats?.activeEscrows || 0}</div>
-                  <div>Completed: {stats?.completedEscrows || 0}</div>
-                </div>
-              </CardContent>
-            </Card>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 hover:border-cyan-500/50 transition-all duration-300">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-slate-300">Total Escrows</CardTitle>
+                  <div className="p-2 bg-cyan-500/10 rounded-lg">
+                    <Shield className="h-4 w-4 text-cyan-400" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white mb-2">{stats?.totalEscrows || 0}</div>
+                  <div className="text-xs text-slate-400 space-y-1">
+                    <div className="flex justify-between">
+                      <span>Active:</span>
+                      <span className="text-green-400">{stats?.activeEscrows || 0}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Completed:</span>
+                      <span className="text-blue-400">{stats?.completedEscrows || 0}</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Value Locked</CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{formatCurrency(stats?.totalValueLocked || "0")}</div>
-                <p className="text-xs text-muted-foreground">
-                  Across all active escrows
-                </p>
-              </CardContent>
-            </Card>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-slate-300">Total Value Locked</CardTitle>
+                  <div className="p-2 bg-blue-500/10 rounded-lg">
+                    <DollarSign className="h-4 w-4 text-blue-400" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white mb-2">{formatCurrency(stats?.totalValueLocked || "0")}</div>
+                  <p className="text-xs text-slate-400">
+                    Across all active escrows
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Active Wallets</CardTitle>
-                <Wallet className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats?.activeWallets || 0}</div>
-                <p className="text-xs text-muted-foreground">
-                  Connected to platform
-                </p>
-              </CardContent>
-            </Card>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-emerald-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 hover:border-purple-500/50 transition-all duration-300">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium text-slate-300">Active Wallets</CardTitle>
+                  <div className="p-2 bg-purple-500/10 rounded-lg">
+                    <Wallet className="h-4 w-4 text-purple-400" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-white mb-2">{stats?.activeWallets || 0}</div>
+                  <p className="text-xs text-slate-400">
+                    Connected to platform
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
 
           {/* Charts and Analytics */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Escrow Status Distribution</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {escrows && Object.entries(
-                    Array.isArray(escrows) ? 
-                    escrows.reduce((acc: any, escrow: any) => {
-                      acc[escrow.status] = (acc[escrow.status] || 0) + 1;
-                      return acc;
-                    }, {}) : {}
-                  ).map(([status, count]) => (
-                    <div key={status} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Badge className={getStatusColor(status)}>
-                          {status}
-                        </Badge>
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 rounded-xl blur-xl"></div>
+              <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50">
+                <CardHeader>
+                  <CardTitle className="text-slate-200 flex items-center space-x-2">
+                    <BarChart3 className="h-5 w-5 text-emerald-400" />
+                    <span>Escrow Status Distribution</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {escrows && Object.entries(
+                      Array.isArray(escrows) ? 
+                      escrows.reduce((acc: any, escrow: any) => {
+                        acc[escrow.status] = (acc[escrow.status] || 0) + 1;
+                        return acc;
+                      }, {}) : {}
+                    ).map(([status, count]) => (
+                      <div key={status} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                        <div className="flex items-center space-x-3">
+                          <Badge className={`${getStatusColor(status)} border-0`}>
+                            {status}
+                          </Badge>
+                          <div className="w-24 bg-slate-700 rounded-full h-2">
+                            <div 
+                              className="bg-gradient-to-r from-emerald-500 to-cyan-500 h-2 rounded-full transition-all duration-1000"
+                              style={{ width: `${(count as number / (stats?.totalEscrows || 1)) * 100}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                        <span className="font-semibold text-slate-200 text-lg">{count as number}</span>
                       </div>
-                      <span className="font-semibold">{count as number}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Top Tokens by Usage</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {Array.isArray(tokens) && tokens.slice(0, 5).map((token: any) => (
-                    <div key={token.symbol} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <div className="font-medium">{token.symbol}</div>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl blur-xl"></div>
+              <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50">
+                <CardHeader>
+                  <CardTitle className="text-slate-200 flex items-center space-x-2">
+                    <TrendingUp className="h-5 w-5 text-cyan-400" />
+                    <span>Top Tokens by Usage</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {Array.isArray(tokens) && tokens.slice(0, 5).map((token: any, index: number) => (
+                      <div key={token.symbol} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg border border-slate-700/50 hover:border-cyan-500/30 transition-all duration-300">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            {index + 1}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-slate-200">{token.symbol}</div>
+                            <div className="text-xs text-slate-400">{token.escrowCount} escrows</div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-slate-200">{formatCurrency(token.totalValue)}</div>
+                        </div>
                       </div>
-                      <div className="text-right">
-                        <div className="font-semibold">{formatCurrency(token.totalValue)}</div>
-                        <div className="text-xs text-muted-foreground">{token.escrowCount} escrows</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </TabsContent>
 
         {/* User Activity Monitor */}
-        <TabsContent value="users" className="space-y-6">
-          <div className="flex items-center space-x-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder="Search by wallet address..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+        <TabsContent value="users" className="space-y-8">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-cyan-500/5 rounded-xl blur-xl"></div>
+            <div className="relative bg-slate-900/30 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+              <div className="flex items-center space-x-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5" />
+                  <Input
+                    placeholder="Search by wallet address..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-12 bg-slate-800/50 border-slate-700/50 text-slate-200 placeholder:text-slate-400 focus:border-emerald-500/50 h-12 rounded-lg"
+                  />
+                </div>
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="w-48 bg-slate-800/50 border-slate-700/50 text-slate-200 h-12 rounded-lg">
+                    <SelectValue placeholder="Filter by role" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-700">
+                    <SelectItem value="all" className="text-slate-200 hover:bg-slate-700">All Roles</SelectItem>
+                    <SelectItem value="exporter" className="text-slate-200 hover:bg-slate-700">Exporters</SelectItem>
+                    <SelectItem value="importer" className="text-slate-200 hover:bg-slate-700">Importers</SelectItem>
+                    <SelectItem value="financier" className="text-slate-200 hover:bg-slate-700">Financiers</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <Select value={roleFilter} onValueChange={setRoleFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="exporter">Exporters</SelectItem>
-                <SelectItem value="importer">Importers</SelectItem>
-                <SelectItem value="financier">Financiers</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Registered Users ({filteredUsers.length})</CardTitle>
-              <CardDescription>User activity and participation overview</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Wallet Address</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Last Activity</TableHead>
-                    <TableHead>KYC Status</TableHead>
-                    <TableHead>Escrows</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.map((user: any) => (
-                    <TableRow key={user.walletAddress}>
-                      <TableCell className="font-mono">
-                        {formatAddress(user.walletAddress)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{user.role}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(user.lastActivity).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={
-                          user.kycStatus === 'approved' ? 'bg-green-100 text-green-800' :
-                          user.kycStatus === 'failed' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }>
-                          {user.kycStatus}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-sm">
-                          Created: {user.escrowsCreated}
-                          <br />
-                          Participated: {user.escrowsParticipated}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => setSelectedUser(user.walletAddress)}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-xl blur-xl"></div>
+            <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="text-slate-200 flex items-center space-x-2">
+                  <Users className="h-5 w-5 text-cyan-400" />
+                  <span>Registered Users ({filteredUsers.length})</span>
+                </CardTitle>
+                <CardDescription className="text-slate-400">User activity and participation overview</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-700/50 hover:bg-slate-800/50">
+                        <TableHead className="text-slate-300">Wallet Address</TableHead>
+                        <TableHead className="text-slate-300">Role</TableHead>
+                        <TableHead className="text-slate-300">Last Activity</TableHead>
+                        <TableHead className="text-slate-300">KYC Status</TableHead>
+                        <TableHead className="text-slate-300">Escrows</TableHead>
+                        <TableHead className="text-slate-300">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUsers.map((user: any) => (
+                        <TableRow key={user.walletAddress} className="border-slate-700/50 hover:bg-slate-800/30 transition-colors duration-200">
+                          <TableCell className="font-mono text-slate-300">
+                            {formatAddress(user.walletAddress)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="border-slate-600 text-slate-300 bg-slate-800/50">
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-slate-300">
+                            {new Date(user.lastActivity).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={
+                              user.kycStatus === 'approved' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                              user.kycStatus === 'failed' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                              'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                            }>
+                              {user.kycStatus}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-slate-300">
+                            <div className="text-sm space-y-1">
+                              <div className="flex justify-between">
+                                <span>Created:</span>
+                                <span className="text-emerald-400">{user.escrowsCreated}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>Participated:</span>
+                                <span className="text-cyan-400">{user.escrowsParticipated}</span>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="hover:bg-slate-700/50 text-slate-400 hover:text-slate-200"
+                              onClick={() => setSelectedUser(user.walletAddress)}
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Escrow Analytics */}
-        <TabsContent value="escrows" className="space-y-6">
-          <div className="flex items-center space-x-4">
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="expired">Expired</SelectItem>
-                <SelectItem value="disputed">Disputed</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Export Escrows
-            </Button>
+        <TabsContent value="escrows" className="space-y-8">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-xl blur-xl"></div>
+            <div className="relative bg-slate-900/30 backdrop-blur-sm border border-slate-700/50 rounded-xl p-6">
+              <div className="flex items-center space-x-4">
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-48 bg-slate-800/50 border-slate-700/50 text-slate-200 h-12 rounded-lg">
+                    <SelectValue placeholder="Filter by status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-800 border-slate-700">
+                    <SelectItem value="all" className="text-slate-200 hover:bg-slate-700">All Status</SelectItem>
+                    <SelectItem value="active" className="text-slate-200 hover:bg-slate-700">Active</SelectItem>
+                    <SelectItem value="completed" className="text-slate-200 hover:bg-slate-700">Completed</SelectItem>
+                    <SelectItem value="expired" className="text-slate-200 hover:bg-slate-700">Expired</SelectItem>
+                    <SelectItem value="disputed" className="text-slate-200 hover:bg-slate-700">Disputed</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button variant="outline" size="sm" className="bg-slate-800/50 border-slate-700/50 hover:bg-slate-700/50 text-slate-300 h-12 px-6 rounded-lg">
+                  <Download className="h-4 w-4 mr-2" />
+                  Export Escrows
+                </Button>
+              </div>
+            </div>
           </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Escrow Analytics</CardTitle>
-              <CardDescription>Detailed escrow tracking and monitoring</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Escrow ID</TableHead>
-                    <TableHead>Participants</TableHead>
-                    <TableHead>Value</TableHead>
-                    <TableHead>Token</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {Array.isArray(escrows) && escrows.map((escrow: any) => (
-                    <TableRow key={escrow.id}>
-                      <TableCell className="font-mono text-sm">
-                        {escrow.escrowId}
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1 text-sm">
-                          <div>E: {formatAddress(escrow.exporter)}</div>
-                          <div>I: {formatAddress(escrow.importer)}</div>
-                          {escrow.financier && (
-                            <div>F: {formatAddress(escrow.financier)}</div>
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-semibold">
-                        {parseFloat(escrow.amount).toFixed(4)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{escrow.tokenSymbol}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(escrow.status)}>
-                          {escrow.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(escrow.createdDate).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-1">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setSelectedEscrow(escrow.id)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => window.open(`https://sepolia.etherscan.io/address/${escrow.contractAddress}`, '_blank')}
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-emerald-500/10 rounded-xl blur-xl"></div>
+            <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="text-slate-200 flex items-center space-x-2">
+                  <Shield className="h-5 w-5 text-purple-400" />
+                  <span>Escrow Analytics</span>
+                </CardTitle>
+                <CardDescription className="text-slate-400">Detailed escrow tracking and monitoring</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-700/50 hover:bg-slate-800/50">
+                        <TableHead className="text-slate-300">Escrow ID</TableHead>
+                        <TableHead className="text-slate-300">Participants</TableHead>
+                        <TableHead className="text-slate-300">Value</TableHead>
+                        <TableHead className="text-slate-300">Token</TableHead>
+                        <TableHead className="text-slate-300">Status</TableHead>
+                        <TableHead className="text-slate-300">Created</TableHead>
+                        <TableHead className="text-slate-300">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {Array.isArray(escrows) && escrows.map((escrow: any) => (
+                        <TableRow key={escrow.id} className="border-slate-700/50 hover:bg-slate-800/30 transition-colors duration-200">
+                          <TableCell className="font-mono text-sm text-slate-300">
+                            {escrow.escrowId}
+                          </TableCell>
+                          <TableCell>
+                            <div className="space-y-1 text-sm text-slate-400">
+                              <div className="flex items-center space-x-2">
+                                <span className="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                                <span>E: {formatAddress(escrow.exporter)}</span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <span className="w-2 h-2 bg-cyan-500 rounded-full"></span>
+                                <span>I: {formatAddress(escrow.importer)}</span>
+                              </div>
+                              {escrow.financier && (
+                                <div className="flex items-center space-x-2">
+                                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                  <span>F: {formatAddress(escrow.financier)}</span>
+                                </div>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell className="font-semibold text-slate-200">
+                            {parseFloat(escrow.amount).toFixed(4)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="border-slate-600 text-slate-300 bg-slate-800/50">
+                              {escrow.tokenSymbol}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={`${getStatusColor(escrow.status)} border-0`}>
+                              {escrow.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-slate-300">
+                            {new Date(escrow.createdDate).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex space-x-2">
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="hover:bg-slate-700/50 text-slate-400 hover:text-slate-200"
+                                onClick={() => setSelectedEscrow(escrow.id)}
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="sm"
+                                className="hover:bg-slate-700/50 text-slate-400 hover:text-slate-200"
+                                onClick={() => window.open(`https://sepolia.etherscan.io/address/${escrow.contractAddress}`, '_blank')}
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Transaction Feed */}
-        <TabsContent value="transactions" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <Activity className="h-5 w-5" />
-                <span>Real-time Transaction Feed</span>
-              </CardTitle>
-              <CardDescription>Live blockchain events and contract interactions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {Array.isArray(transactions) && transactions.map((tx: any) => (
-                  <div key={tx.txHash} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline">{tx.eventName}</Badge>
-                        <span className="text-sm text-muted-foreground">
-                          Block #{tx.blockNumber}
-                        </span>
-                      </div>
-                      <div className="font-mono text-sm">
-                        Contract: {formatAddress(tx.contractAddress)}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {new Date(tx.timestamp).toLocaleString()}
+        <TabsContent value="transactions" className="space-y-8">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-xl blur-xl"></div>
+            <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="text-slate-200 flex items-center space-x-2">
+                  <Activity className="h-5 w-5 text-orange-400" />
+                  <span>Real-time Transaction Feed</span>
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse ml-2"></div>
+                </CardTitle>
+                <CardDescription className="text-slate-400">Live blockchain events and contract interactions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {Array.isArray(transactions) && transactions.map((tx: any) => (
+                    <div key={tx.txHash} className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-slate-800/50 to-slate-700/50 rounded-lg blur-sm group-hover:blur-md transition-all duration-300"></div>
+                      <div className="relative flex items-center justify-between p-6 bg-slate-800/30 border border-slate-700/50 rounded-lg hover:border-orange-500/30 transition-all duration-300">
+                        <div className="space-y-3">
+                          <div className="flex items-center space-x-3">
+                            <Badge variant="outline" className="border-orange-500/50 text-orange-400 bg-orange-500/10">
+                              {tx.eventName}
+                            </Badge>
+                            <span className="text-sm text-slate-400 font-mono">
+                              Block #{tx.blockNumber}
+                            </span>
+                            <div className="flex items-center space-x-1">
+                              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                              <span className="text-xs text-emerald-400">Live</span>
+                            </div>
+                          </div>
+                          <div className="font-mono text-sm text-slate-300">
+                            Contract: {formatAddress(tx.contractAddress)}
+                          </div>
+                          <div className="text-xs text-slate-500 flex items-center space-x-2">
+                            <Clock className="h-3 w-3" />
+                            <span>{new Date(tx.timestamp).toLocaleString()}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="hover:bg-slate-700/50 text-slate-400 hover:text-slate-200 border border-slate-600/50 hover:border-orange-500/50"
+                            onClick={() => window.open(getEtherscanUrl(tx.txHash, tx.networkId), '_blank')}
+                          >
+                            <ExternalLink className="h-4 w-4 mr-1" />
+                            View
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => window.open(getEtherscanUrl(tx.txHash, tx.networkId), '_blank')}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Token Monitoring */}
-        <TabsContent value="tokens" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Token Distribution & Usage</CardTitle>
-              <CardDescription>Monitor token usage across the platform</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Token</TableHead>
-                    <TableHead>Total Value</TableHead>
-                    <TableHead>Escrow Count</TableHead>
-                    <TableHead>Platform %</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {Array.isArray(tokens) && tokens.map((token: any) => (
-                    <TableRow key={token.symbol}>
-                      <TableCell className="font-semibold">{token.symbol}</TableCell>
-                      <TableCell>{formatCurrency(token.totalValue)}</TableCell>
-                      <TableCell>{token.escrowCount}</TableCell>
-                      <TableCell>{token.percentage.toFixed(1)}%</TableCell>
-                      <TableCell>
-                        <Badge variant="default">Active</Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+        <TabsContent value="tokens" className="space-y-8">
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-500/10 to-orange-500/10 rounded-xl blur-xl"></div>
+            <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="text-slate-200 flex items-center space-x-2">
+                  <BarChart3 className="h-5 w-5 text-yellow-400" />
+                  <span>Token Distribution & Usage</span>
+                </CardTitle>
+                <CardDescription className="text-slate-400">Monitor token usage across the platform</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-700/50 hover:bg-slate-800/50">
+                        <TableHead className="text-slate-300">Token</TableHead>
+                        <TableHead className="text-slate-300">Total Value</TableHead>
+                        <TableHead className="text-slate-300">Escrow Count</TableHead>
+                        <TableHead className="text-slate-300">Platform %</TableHead>
+                        <TableHead className="text-slate-300">Status</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {Array.isArray(tokens) && tokens.map((token: any, index: number) => (
+                        <TableRow key={token.symbol} className="border-slate-700/50 hover:bg-slate-800/30 transition-colors duration-200">
+                          <TableCell className="font-semibold text-slate-200 flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                              {token.symbol.charAt(0)}
+                            </div>
+                            <span>{token.symbol}</span>
+                          </TableCell>
+                          <TableCell className="text-slate-200 font-semibold">
+                            {formatCurrency(token.totalValue)}
+                          </TableCell>
+                          <TableCell className="text-slate-300">
+                            <div className="flex items-center space-x-2">
+                              <span>{token.escrowCount}</span>
+                              <div className="w-16 bg-slate-700 rounded-full h-1.5">
+                                <div 
+                                  className="bg-gradient-to-r from-yellow-500 to-orange-500 h-1.5 rounded-full transition-all duration-1000"
+                                  style={{ width: `${(token.escrowCount / (tokens[0]?.escrowCount || 1)) * 100}%` }}
+                                ></div>
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-slate-300">
+                            <span className="text-yellow-400 font-semibold">{token.percentage.toFixed(1)}%</span>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 border-0">
+                              Active
+                            </Badge>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Trade Finance Pools */}
@@ -1044,113 +1212,149 @@ export default function EscrowDashboard() {
         </TabsContent>
 
         {/* KYC & Verification */}
-        <TabsContent value="kyc" className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">KYC Overview</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span>Approved</span>
-                    <Badge className="bg-green-100 text-green-800">
-                      {filteredUsers.filter(u => u.kycStatus === 'approved').length}
-                    </Badge>
+        <TabsContent value="kyc" className="space-y-8">
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 hover:border-green-500/50 transition-all duration-300">
+                <CardHeader>
+                  <CardTitle className="text-lg text-slate-200 flex items-center space-x-2">
+                    <Shield className="h-5 w-5 text-green-400" />
+                    <span>KYC Overview</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                      <span className="text-slate-300">Approved</span>
+                      <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 border-0">
+                        {filteredUsers.filter(u => u.kycStatus === 'approved').length}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                      <span className="text-slate-300">Pending</span>
+                      <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 border-0">
+                        {filteredUsers.filter(u => u.kycStatus === 'pending').length}
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between items-center p-3 bg-slate-800/50 rounded-lg border border-slate-700/50">
+                      <span className="text-slate-300">Failed</span>
+                      <Badge className="bg-red-500/20 text-red-400 border-red-500/30 border-0">
+                        {filteredUsers.filter(u => u.kycStatus === 'failed').length}
+                      </Badge>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span>Pending</span>
-                    <Badge className="bg-yellow-100 text-yellow-800">
-                      {filteredUsers.filter(u => u.kycStatus === 'pending').length}
-                    </Badge>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Failed</span>
-                    <Badge className="bg-red-100 text-red-800">
-                      {filteredUsers.filter(u => u.kycStatus === 'failed').length}
-                    </Badge>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            </div>
             
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Verification Rate</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">
-                  {filteredUsers.length > 0 ? 
-                    Math.round((filteredUsers.filter(u => u.kycStatus === 'approved').length / filteredUsers.length) * 100) : 0
-                  }%
-                </div>
-                <p className="text-sm text-muted-foreground">Users with approved KYC</p>
-              </CardContent>
-            </Card>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 hover:border-blue-500/50 transition-all duration-300">
+                <CardHeader>
+                  <CardTitle className="text-lg text-slate-200 flex items-center space-x-2">
+                    <BarChart3 className="h-5 w-5 text-blue-400" />
+                    <span>Verification Rate</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {filteredUsers.length > 0 ? 
+                      Math.round((filteredUsers.filter(u => u.kycStatus === 'approved').length / filteredUsers.length) * 100) : 0
+                    }%
+                  </div>
+                  <p className="text-sm text-slate-400">Users with approved KYC</p>
+                  <div className="w-full bg-slate-700 rounded-full h-2 mt-3">
+                    <div 
+                      className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full transition-all duration-1000"
+                      style={{ width: `${filteredUsers.length > 0 ? (filteredUsers.filter(u => u.kycStatus === 'approved').length / filteredUsers.length) * 100 : 0}%` }}
+                    ></div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 rounded-xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50 hover:border-purple-500/50 transition-all duration-300">
+                <CardHeader>
+                  <CardTitle className="text-lg text-slate-200 flex items-center space-x-2">
+                    <Clock className="h-5 w-5 text-purple-400" />
+                    <span>Recent Reviews</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-4xl font-bold text-white mb-2">
+                    {filteredUsers.filter(u => u.kycStatus === 'pending').length}
+                  </div>
+                  <p className="text-sm text-slate-400">Pending review</p>
+                  <div className="flex items-center space-x-2 mt-3">
+                    <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-yellow-400">Awaiting verification</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-500/10 to-gray-500/10 rounded-xl blur-xl"></div>
+            <Card className="relative bg-slate-900/50 backdrop-blur-sm border border-slate-700/50">
               <CardHeader>
-                <CardTitle className="text-lg">Recent Reviews</CardTitle>
+                <CardTitle className="text-slate-200">KYC Status by User</CardTitle>
+                <CardDescription className="text-slate-400">View-only KYC verification status</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">
-                  {filteredUsers.filter(u => u.kycStatus === 'pending').length}
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-slate-700/50 hover:bg-slate-800/50">
+                        <TableHead className="text-slate-300">Wallet Address</TableHead>
+                        <TableHead className="text-slate-300">Role</TableHead>
+                        <TableHead className="text-slate-300">KYC Status</TableHead>
+                        <TableHead className="text-slate-300">Submitted</TableHead>
+                        <TableHead className="text-slate-300">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUsers.map((user: any) => (
+                        <TableRow key={user.walletAddress} className="border-slate-700/50 hover:bg-slate-800/30 transition-colors duration-200">
+                          <TableCell className="font-mono text-slate-300">
+                            {formatAddress(user.walletAddress)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="border-slate-600 text-slate-300 bg-slate-800/50">
+                              {user.role}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge className={
+                              user.kycStatus === 'approved' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' :
+                              user.kycStatus === 'failed' ? 'bg-red-500/20 text-red-400 border-red-500/30' :
+                              'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                            }>
+                              {user.kycStatus}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-slate-300">
+                            {new Date(user.lastActivity).toLocaleDateString()}
+                          </TableCell>
+                          <TableCell>
+                            <Button variant="ghost" size="sm" className="hover:bg-slate-700/50 text-slate-400 hover:text-slate-200">
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
-                <p className="text-sm text-muted-foreground">Pending review</p>
               </CardContent>
             </Card>
           </div>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>KYC Status by User</CardTitle>
-              <CardDescription>View-only KYC verification status</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Wallet Address</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>KYC Status</TableHead>
-                    <TableHead>Submitted</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.map((user: any) => (
-                    <TableRow key={user.walletAddress}>
-                      <TableCell className="font-mono">
-                        {formatAddress(user.walletAddress)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{user.role}</Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={
-                          user.kycStatus === 'approved' ? 'bg-green-100 text-green-800' :
-                          user.kycStatus === 'failed' ? 'bg-red-100 text-red-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }>
-                          {user.kycStatus}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(user.lastActivity).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        <Button variant="ghost" size="sm">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

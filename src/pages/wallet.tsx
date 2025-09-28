@@ -59,14 +59,26 @@ export default function Wallet() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <img 
-            src={logoPath} 
-            alt="BlockFinaX Logo" 
-            className="w-24 h-16 object-contain mx-auto mb-4"
-          />
-          <div className="text-lg font-semibold mb-2">Loading BlockFinaX...</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-emerald-50 flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-200/50 to-cyan-200/50 rounded-full blur-xl animate-pulse"></div>
+            <div className="relative p-6 bg-white/80 backdrop-blur-sm border border-emerald-200/50 rounded-2xl shadow-xl">
+              <img 
+                src={logoPath} 
+                alt="BlockFinaX Logo" 
+                className="w-16 h-12 object-contain mx-auto mb-4"
+              />
+              <div className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent mb-2">
+                Loading BlockFinaX...
+              </div>
+              <div className="flex justify-center space-x-1">
+                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+                <div className="w-2 h-2 bg-cyan-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -132,19 +144,30 @@ export default function Wallet() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-emerald-50">
+      {/* Animated Background Elements */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-emerald-200/30 to-cyan-200/30 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-cyan-200/30 to-blue-200/30 rounded-full blur-3xl animate-pulse" style={{animationDelay: '2s'}}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-emerald-100/20 to-cyan-100/20 rounded-full blur-3xl animate-pulse" style={{animationDelay: '4s'}}></div>
+      </div>
+
       {/* Header */}
-      <header className="bg-card shadow-sm border-b border-border">
+      <header className="relative bg-white/80 backdrop-blur-xl shadow-lg border-b border-emerald-100/50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14 sm:h-16">
             <div className="flex items-center space-x-2 sm:space-x-3 min-w-0">
-              <img 
-                src={logoPath} 
-                alt="BlockFinaX Logo" 
-                className="w-6 sm:w-8 h-6 sm:h-8 object-contain shrink-0"
-              />
-              <h1 className="text-lg sm:text-xl font-semibold truncate">BlockFinaX</h1>
-              <Badge variant="secondary" className="bg-orange-100 dark:bg-orange-900 text-orange-800 dark:text-orange-200 text-xs hidden sm:inline-flex">
+              <div className="p-2 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl shadow-lg">
+                <img 
+                  src={logoPath} 
+                  alt="BlockFinaX Logo" 
+                  className="w-6 sm:w-8 h-6 sm:h-8 object-contain"
+                />
+              </div>
+              <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 bg-clip-text text-transparent">
+                BlockFinaX
+              </h1>
+              <Badge variant="secondary" className="bg-emerald-100 text-emerald-800 border-emerald-200 hidden sm:inline-flex">
                 TESTNET
               </Badge>
             </div>
@@ -154,7 +177,7 @@ export default function Wallet() {
                 variant="outline"
                 size="sm"
                 onClick={() => setLocation('/referrals')}
-                className="hidden sm:flex"
+                className="hidden sm:flex bg-white/50 border-emerald-200/50 hover:bg-emerald-50 text-emerald-700 hover:text-emerald-800"
               >
                 <Gift className="h-4 w-4 mr-2" />
                 Referrals
@@ -171,41 +194,41 @@ export default function Wallet() {
                 variant="outline"
                 size="icon"
                 onClick={() => setLocation('/referrals')}
-                className="sm:hidden h-8 w-8"
+                className="sm:hidden h-8 w-8 bg-white/50 border-emerald-200/50 hover:bg-emerald-50"
               >
                 <Gift className="h-3 w-3" />
               </Button>
               
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
-                    <Settings className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10 bg-white/50 border-emerald-200/50 hover:bg-emerald-50">
+                    <Settings className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  <DropdownMenuItem onClick={handleExportMnemonic}>
+                <DropdownMenuContent align="end" className="w-48 bg-white/95 backdrop-blur-sm border-emerald-200/50">
+                  <DropdownMenuItem onClick={handleExportMnemonic} className="hover:bg-emerald-50 text-slate-700 hover:text-emerald-800">
                     <Download className="h-4 w-4 mr-2" />
                     Export Seed Phrase
                   </DropdownMenuItem>
                   
-                  <DropdownMenuItem onClick={handleExportPrivateKey}>
+                  <DropdownMenuItem onClick={handleExportPrivateKey} className="hover:bg-emerald-50 text-slate-700 hover:text-emerald-800">
                     <Upload className="h-4 w-4 mr-2" />
                     Export Private Key
                   </DropdownMenuItem>
                   
-                  <DropdownMenuItem onClick={() => setActiveTab('profile')}>
+                  <DropdownMenuItem onClick={() => setActiveTab('profile')} className="hover:bg-emerald-50 text-slate-700 hover:text-emerald-800">
                     <User className="h-4 w-4 mr-2" />
                     Profile Settings
                   </DropdownMenuItem>
                   
-                  <DropdownMenuItem disabled>
+                  <DropdownMenuItem disabled className="text-slate-500">
                     <Network className="h-4 w-4 mr-2" />
                     Network Settings
                   </DropdownMenuItem>
                   
-                  <DropdownMenuSeparator />
+                  <DropdownMenuSeparator className="bg-emerald-200/50" />
                   
-                  <DropdownMenuItem onClick={handleLockWallet} className="text-destructive">
+                  <DropdownMenuItem onClick={handleLockWallet} className="text-red-600 hover:bg-red-50 hover:text-red-700">
                     <Lock className="h-4 w-4 mr-2" />
                     Lock Wallet
                   </DropdownMenuItem>
@@ -217,89 +240,131 @@ export default function Wallet() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <main className="relative flex-1 max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 py-4 sm:py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-6 h-14 sm:h-12 p-1">
-            <TabsTrigger value="overview" className="flex flex-col items-center justify-center space-y-1 text-xs p-1">
+          <TabsList className="grid w-full grid-cols-6 h-14 sm:h-12 p-1 bg-white/50 backdrop-blur-sm border border-emerald-200/50 rounded-xl shadow-lg">
+            <TabsTrigger value="overview" className="flex flex-col items-center justify-center space-y-1 text-xs p-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">
               <CreditCard className="h-5 w-5 sm:h-4 sm:w-4" />
               <span className="text-[10px] sm:text-xs font-medium">Wallet</span>
             </TabsTrigger>
-            <TabsTrigger value="messages" className="flex flex-col items-center justify-center space-y-1 text-xs p-1">
+            <TabsTrigger value="messages" className="flex flex-col items-center justify-center space-y-1 text-xs p-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">
               <MessageCircle className="h-5 w-5 sm:h-4 sm:w-4" />
               <span className="text-[10px] sm:text-xs font-medium">Chat</span>
             </TabsTrigger>
-            <TabsTrigger value="invoices" className="flex flex-col items-center justify-center space-y-1 text-xs p-1">
+            <TabsTrigger value="invoices" className="flex flex-col items-center justify-center space-y-1 text-xs p-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">
               <Receipt className="h-5 w-5 sm:h-4 sm:w-4" />
               <span className="text-[10px] sm:text-xs font-medium">Invoices</span>
             </TabsTrigger>
-            <TabsTrigger value="defi" className="flex flex-col items-center justify-center space-y-1 text-xs p-1">
+            <TabsTrigger value="defi" className="flex flex-col items-center justify-center space-y-1 text-xs p-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">
               <TrendingUp className="h-5 w-5 sm:h-4 sm:w-4" />
               <span className="text-[10px] sm:text-xs font-medium">Trade Finance</span>
             </TabsTrigger>
-            <TabsTrigger value="documents" className="flex flex-col items-center justify-center space-y-1 text-xs p-1">
+            <TabsTrigger value="documents" className="flex flex-col items-center justify-center space-y-1 text-xs p-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">
               <FileText className="h-5 w-5 sm:h-4 sm:w-4" />
               <span className="text-[10px] sm:text-xs font-medium">Docs</span>
             </TabsTrigger>
-            <TabsTrigger value="escrow" className="flex flex-col items-center justify-center space-y-1 text-xs p-1">
+            <TabsTrigger value="escrow" className="flex flex-col items-center justify-center space-y-1 text-xs p-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-500 data-[state=active]:to-cyan-500 data-[state=active]:text-white rounded-lg transition-all duration-300">
               <Shield className="h-5 w-5 sm:h-4 sm:w-4" />
               <span className="text-[10px] sm:text-xs font-medium">Contracts</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="mt-4 sm:mt-6">
+          <TabsContent value="overview" className="mt-6 sm:mt-8">
             {/* Mobile Network Selector */}
-            <div className="sm:hidden mb-4">
-              <NetworkSelector
-                selectedNetworkId={selectedNetworkId}
-                onNetworkChange={setSelectedNetworkId}
-              />
+            <div className="sm:hidden mb-6">
+              <div className="bg-white/60 backdrop-blur-sm border border-emerald-200/50 rounded-xl p-4 shadow-lg">
+                <NetworkSelector
+                  selectedNetworkId={selectedNetworkId}
+                  onNetworkChange={setSelectedNetworkId}
+                />
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 gap-4 sm:gap-8">
-              <EnhancedWalletOverview 
-                selectedNetworkId={selectedNetworkId}
-                className="mb-4 sm:mb-6"
-                onTabChange={setActiveTab}
-              />
-              <TransactionHistory networkId={selectedNetworkId} />
+            <div className="grid grid-cols-1 gap-6 sm:gap-8">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/50 to-cyan-100/50 rounded-2xl blur-xl"></div>
+                <div className="relative bg-white/80 backdrop-blur-sm border border-emerald-200/50 rounded-2xl p-6 shadow-xl">
+                  <EnhancedWalletOverview 
+                    selectedNetworkId={selectedNetworkId}
+                    className="mb-4 sm:mb-6"
+                    onTabChange={setActiveTab}
+                  />
+                </div>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-100/50 to-blue-100/50 rounded-2xl blur-xl"></div>
+                <div className="relative bg-white/80 backdrop-blur-sm border border-cyan-200/50 rounded-2xl p-6 shadow-xl">
+                  <TransactionHistory networkId={selectedNetworkId} />
+                </div>
+              </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="messages" className="mt-4 sm:mt-6">
-            <WalletChat />
+          <TabsContent value="messages" className="mt-6 sm:mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-100/50 to-pink-100/50 rounded-2xl blur-xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-purple-200/50 rounded-2xl p-6 shadow-xl">
+                <WalletChat />
+              </div>
+            </div>
           </TabsContent>
 
-          <TabsContent value="invoices" className="mt-4 sm:mt-6">
-            <InvoiceManager walletAddress={wallet?.address || ''} />
+          <TabsContent value="invoices" className="mt-6 sm:mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-100/50 to-red-100/50 rounded-2xl blur-xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-orange-200/50 rounded-2xl p-6 shadow-xl">
+                <InvoiceManager walletAddress={wallet?.address || ''} />
+              </div>
+            </div>
           </TabsContent>
 
-          <TabsContent value="defi" className="mt-4 sm:mt-6">
-            <TradeFinanceDashboard selectedNetworkId={selectedNetworkId} />
+          <TabsContent value="defi" className="mt-6 sm:mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/50 to-teal-100/50 rounded-2xl blur-xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-emerald-200/50 rounded-2xl p-6 shadow-xl">
+                <TradeFinanceDashboard selectedNetworkId={selectedNetworkId} />
+              </div>
+            </div>
           </TabsContent>
 
-          <TabsContent value="documents" className="mt-4 sm:mt-6">
-            <DocumentManager />
+          <TabsContent value="documents" className="mt-6 sm:mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-100/50 to-indigo-100/50 rounded-2xl blur-xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-blue-200/50 rounded-2xl p-6 shadow-xl">
+                <DocumentManager />
+              </div>
+            </div>
           </TabsContent>
 
-          <TabsContent value="escrow" className="mt-4 sm:mt-6">
-            <SubWalletManager />
+          <TabsContent value="escrow" className="mt-6 sm:mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-slate-100/50 to-gray-100/50 rounded-2xl blur-xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-slate-200/50 rounded-2xl p-6 shadow-xl">
+                <SubWalletManager />
+              </div>
+            </div>
           </TabsContent>
 
-          <TabsContent value="profile" className="mt-6">
-            <ProfileSettings />
+          <TabsContent value="profile" className="mt-6 sm:mt-8">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-100/50 to-cyan-100/50 rounded-2xl blur-xl"></div>
+              <div className="relative bg-white/80 backdrop-blur-sm border border-emerald-200/50 rounded-2xl p-6 shadow-xl">
+                <ProfileSettings />
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </main>
 
       {/* Export Modal */}
       <Dialog open={exportModalOpen} onOpenChange={setExportModalOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md bg-white/95 backdrop-blur-xl border-emerald-200/50 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="flex items-center space-x-2">
-              <Download className="h-5 w-5" />
+            <DialogTitle className="flex items-center space-x-2 text-slate-800">
+              <Download className="h-5 w-5 text-emerald-600" />
               <span>Export {exportType === 'privateKey' ? 'Private Key' : 'Seed Phrase'}</span>
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-slate-600">
               {exportType === 'privateKey' 
                 ? 'Your private key gives full access to your wallet. Keep it secure and never share it.'
                 : 'Your seed phrase can restore your entire wallet. Store it safely and never share it.'
@@ -309,12 +374,12 @@ export default function Wallet() {
           
           <div className="space-y-4">
             {/* Security Warning */}
-            <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
+            <div className="p-4 bg-red-50/80 border border-red-200/50 rounded-lg backdrop-blur-sm">
               <div className="flex items-start space-x-3">
-                <Shield className="h-5 w-5 text-destructive mt-0.5" />
+                <Shield className="h-5 w-5 text-red-500 mt-0.5" />
                 <div className="text-sm">
-                  <p className="font-semibold text-destructive mb-1">Security Warning</p>
-                  <p className="text-muted-foreground">
+                  <p className="font-semibold text-red-800 mb-1">Security Warning</p>
+                  <p className="text-red-700">
                     Anyone with access to this {exportType === 'privateKey' ? 'private key' : 'seed phrase'} can steal your funds. 
                     Only copy it to a secure location.
                   </p>
@@ -324,20 +389,20 @@ export default function Wallet() {
 
             {/* Export Data */}
             <div className="space-y-2">
-              <div className="text-sm font-medium">
+              <div className="text-sm font-medium text-slate-700">
                 {exportType === 'privateKey' ? 'Private Key' : 'Seed Phrase'}
               </div>
               <div className="relative">
                 <textarea
                   id="export-data"
-                  className="w-full p-3 bg-muted rounded-lg font-mono text-sm min-h-[100px] resize-none"
+                  className="w-full p-3 bg-slate-50/80 border border-slate-200/50 rounded-lg font-mono text-sm text-slate-800 min-h-[100px] resize-none focus:border-emerald-300 focus:ring-emerald-200"
                   value={showExportData ? exportedData : '•'.repeat(exportedData.length)}
                   readOnly
                 />
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="absolute top-2 right-2"
+                  className="absolute top-2 right-2 hover:bg-slate-100 text-slate-600"
                   onClick={() => setShowExportData(!showExportData)}
                 >
                   {showExportData ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -347,10 +412,10 @@ export default function Wallet() {
           </div>
 
           <DialogFooter className="flex flex-col sm:flex-row gap-2">
-            <Button variant="outline" onClick={() => setExportModalOpen(false)}>
+            <Button variant="outline" onClick={() => setExportModalOpen(false)} className="border-slate-200 text-slate-700 hover:bg-slate-50">
               Cancel
             </Button>
-            <Button onClick={handleCopyToClipboard} className="flex items-center space-x-2">
+            <Button onClick={handleCopyToClipboard} className="flex items-center space-x-2 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 text-white border-0">
               <Copy className="h-4 w-4" />
               <span>Copy to Clipboard</span>
             </Button>
