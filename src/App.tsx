@@ -231,6 +231,19 @@ function WelcomeScreen() {
         </div>
       </div>
 
+      {/* Right side - Get Started */}
+      <div className="absolute top-18 right-8 z-20">
+        <Button
+          size="lg"
+          className="rounded-full px-4 h-12 text-xl font-semibold bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 flex items-center"
+          onClick={handleGetStarted}
+        >
+          <Sparkles className="mr-3 h-6 w-6" />
+          Get Started
+          <ArrowRight className="ml-3 h-6 w-6" />
+        </Button>
+      </div>
+
       <div className="relative z-10 container mx-auto px-6 py-20">
         <div className="max-w-7xl mx-auto">
           
@@ -299,19 +312,6 @@ function WelcomeScreen() {
                   ))}
                 </div>
               </div>
-            </div>
-            
-            {/* Right side - Get Started */}
-            <div className="flex justify-center">
-              <Button
-                size="lg"
-                className="w-full max-w-md h-16 text-xl font-semibold bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 border-0 shadow-xl hover:shadow-2xl transition-all duration-300"
-                onClick={handleGetStarted}
-              >
-                <Sparkles className="mr-3 h-6 w-6" />
-                Get Started
-                <ArrowRight className="ml-auto h-6 w-6" />
-              </Button>
             </div>
 
             {/* Dialog */}

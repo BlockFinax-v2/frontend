@@ -11,8 +11,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
 import { useWallet } from '@/hooks/use-wallet';
-import { Loader2, Eye, EyeOff, ArrowLeft, Download, Key, AlertTriangle } from 'lucide-react';
+import { Loader2, Eye, EyeOff, ArrowLeft, Download, Key, AlertTriangle, Network } from 'lucide-react';
 import { logoPath } from "@/assets";
 
 const importWalletSchema = z.object({
@@ -73,11 +74,11 @@ export default function ImportWallet() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center bg-gradient-to-br from-slate-950 via-gray-900 to-emerald-950 p-4">
       <div className="w-full max-w-lg">
         {/* Back Button */}
         <div className="mb-6">
-          <Button variant="ghost" size="sm" asChild>
+          <Button variant="ghost" size="sm" asChild className="text-slate-400 hover:text-white hover:bg-slate-800/50">
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Home
@@ -85,37 +86,41 @@ export default function ImportWallet() {
           </Button>
         </div>
 
-        <Card className="shadow-xl border-0">
-          <CardHeader className="text-center pb-4">
-            <div className="w-16 h-16 mx-auto mb-4 p-2 bg-primary/10 rounded-full flex items-center justify-center">
-              <img 
-                src={logoPath} 
-                alt="BlockFinaX Logo" 
-                className="w-12 h-12 object-contain"
+        <Card className="shadow-2xl border-0 bg-slate-900/90 border-emerald-500/20 backdrop-blur-xl relative overflow-hidden">
+          {/* Animated border */}
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-emerald-500/20 animate-pulse" />
+          <div className="absolute inset-[1px] bg-slate-900 rounded-lg" />
+
+          <CardHeader className="text-center pb-4 relative z-10">
+            <div className="w-16 h-16 mx-auto mb-4 p-2 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+              <img
+                src={logoPath}
+                alt="BlockFinaX Logo"
+                className="w-12 h-12 object-contain invert"
               />
             </div>
-            <CardTitle className="text-2xl font-bold text-gray-900 dark:text-white">
+            <CardTitle className="text-2xl font-bold text-white">
               Import Wallet
             </CardTitle>
-            <p className="text-gray-600 dark:text-gray-300 text-sm">
+            <p className="text-slate-400 text-sm">
               Import your existing wallet into BlockFinaX using a seed phrase or private key
             </p>
           </CardHeader>
-          
-          <CardContent className="pt-0">
+
+          <CardContent className="pt-0 relative z-10">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="name" className="text-sm font-medium">
+                <Label htmlFor="name" className="text-sm font-medium text-slate-300">
                   Wallet Name
                 </Label>
                 <Input
                   id="name"
                   placeholder="e.g., My Imported Wallet"
                   {...register('name')}
-                  className={`h-11 ${errors.name ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                  className={`h-11 bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500/50 ${errors.name ? 'border-red-500/50 focus-visible:ring-red-500/50' : ''}`}
                 />
                 {errors.name && (
-                  <p className="text-sm text-destructive flex items-center">
+                  <p className="text-sm text-red-400 flex items-center">
                     <AlertTriangle className="h-4 w-4 mr-1" />
                     {errors.name.message}
                   </p>
@@ -123,52 +128,52 @@ export default function ImportWallet() {
               </div>
 
               <div className="space-y-4">
-                <Label className="text-sm font-medium">Import Method</Label>
+                <Label className="text-sm font-medium text-slate-300">Import Method</Label>
                 <Tabs value={importType} onValueChange={handleTabChange} className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="mnemonic" className="flex items-center space-x-2">
+                  <TabsList className="grid w-full grid-cols-2 bg-slate-800/50 border-slate-700">
+                    <TabsTrigger value="mnemonic" className="flex items-center space-x-2 data-[state=active]:bg-emerald-500/20 data-[state=active]:text-emerald-400">
                       <Download className="h-4 w-4" />
                       <span>Seed Phrase</span>
                     </TabsTrigger>
-                    <TabsTrigger value="private_key" className="flex items-center space-x-2">
+                    <TabsTrigger value="private_key" className="flex items-center space-x-2 data-[state=active]:bg-cyan-500/20 data-[state=active]:text-cyan-400">
                       <Key className="h-4 w-4" />
                       <span>Private Key</span>
                     </TabsTrigger>
                   </TabsList>
-                  
+
                   <TabsContent value="mnemonic" className="space-y-4 mt-4">
                     <div className="space-y-2">
-                      <Label htmlFor="mnemonic" className="text-sm font-medium">
+                      <Label htmlFor="mnemonic" className="text-sm font-medium text-slate-300">
                         Seed Phrase
-                        <Badge variant="secondary" className="ml-2 text-xs">
+                        <Badge className="ml-2 text-xs bg-slate-700 text-slate-300">
                           12-24 words
                         </Badge>
                       </Label>
                       <Textarea
                         id="mnemonic"
                         placeholder="Enter your 12-24 word seed phrase separated by spaces"
-                        className={`min-h-[100px] resize-none ${errors.mnemonic ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                        className={`min-h-[100px] resize-none bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500/50 ${errors.mnemonic ? 'border-red-500/50 focus-visible:ring-red-500/50' : ''}`}
                         {...register('mnemonic')}
                       />
                       {errors.mnemonic && (
-                        <p className="text-sm text-destructive flex items-center">
+                        <p className="text-sm text-red-400 flex items-center">
                           <AlertTriangle className="h-4 w-4 mr-1" />
                           {errors.mnemonic.message}
                         </p>
                       )}
-                      <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
-                        <AlertDescription className="text-blue-800 dark:text-blue-200 text-sm">
+                      <Alert className="bg-gradient-to-r from-blue-950/50 to-cyan-950/50 border-blue-500/30 backdrop-blur-sm">
+                        <AlertDescription className="text-blue-200 text-sm">
                           Enter each word separated by a single space. Make sure the order is correct.
                         </AlertDescription>
                       </Alert>
                     </div>
                   </TabsContent>
-                  
+
                   <TabsContent value="private_key" className="space-y-4 mt-4">
                     <div className="space-y-2">
-                      <Label htmlFor="privateKey" className="text-sm font-medium">
+                      <Label htmlFor="privateKey" className="text-sm font-medium text-slate-300">
                         Private Key
-                        <Badge variant="secondary" className="ml-2 text-xs">
+                        <Badge className="ml-2 text-xs bg-slate-700 text-slate-300">
                           Hex format
                         </Badge>
                       </Label>
@@ -177,27 +182,27 @@ export default function ImportWallet() {
                           id="privateKey"
                           type={showPrivateKey ? 'text' : 'password'}
                           placeholder="Enter your private key (0x...)"
-                          className={`h-11 pr-10 ${errors.privateKey ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                          className={`h-11 pr-10 bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500/50 ${errors.privateKey ? 'border-red-500/50 focus-visible:ring-red-500/50' : ''}`}
                           {...register('privateKey')}
                         />
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-2 top-1.5 h-8 w-8 p-0"
+                          className="absolute right-2 top-1.5 h-8 w-8 p-0 text-slate-400 hover:text-white"
                           onClick={() => setShowPrivateKey(!showPrivateKey)}
                         >
                           {showPrivateKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </Button>
                       </div>
                       {errors.privateKey && (
-                        <p className="text-sm text-destructive flex items-center">
+                        <p className="text-sm text-red-400 flex items-center">
                           <AlertTriangle className="h-4 w-4 mr-1" />
                           {errors.privateKey.message}
                         </p>
                       )}
-                      <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950 dark:border-amber-800">
-                        <AlertDescription className="text-amber-800 dark:text-amber-200 text-sm">
+                      <Alert className="bg-gradient-to-r from-amber-950/50 to-orange-950/50 border-amber-500/30 backdrop-blur-sm">
+                        <AlertDescription className="text-amber-200 text-sm">
                           Private keys should start with "0x" followed by 64 hexadecimal characters.
                         </AlertDescription>
                       </Alert>
@@ -207,7 +212,7 @@ export default function ImportWallet() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium">
+                <Label htmlFor="password" className="text-sm font-medium text-slate-300">
                   New Password
                 </Label>
                 <div className="relative">
@@ -216,20 +221,20 @@ export default function ImportWallet() {
                     type={showPassword ? 'text' : 'password'}
                     placeholder="Enter a strong password"
                     {...register('password')}
-                    className={`h-11 pr-10 ${errors.password ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    className={`h-11 pr-10 bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500/50 ${errors.password ? 'border-red-500/50 focus-visible:ring-red-500/50' : ''}`}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-2 top-1.5 h-8 w-8 p-0"
+                    className="absolute right-2 top-1.5 h-8 w-8 p-0 text-slate-400 hover:text-white"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
                 {errors.password && (
-                  <p className="text-sm text-destructive flex items-center">
+                  <p className="text-sm text-red-400 flex items-center">
                     <AlertTriangle className="h-4 w-4 mr-1" />
                     {errors.password.message}
                   </p>
@@ -237,7 +242,7 @@ export default function ImportWallet() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                <Label htmlFor="confirmPassword" className="text-sm font-medium text-slate-300">
                   Confirm Password
                 </Label>
                 <div className="relative">
@@ -246,41 +251,43 @@ export default function ImportWallet() {
                     type={showConfirmPassword ? 'text' : 'password'}
                     placeholder="Confirm your password"
                     {...register('confirmPassword')}
-                    className={`h-11 pr-10 ${errors.confirmPassword ? 'border-destructive focus-visible:ring-destructive' : ''}`}
+                    className={`h-11 pr-10 bg-slate-800/50 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500/50 ${errors.confirmPassword ? 'border-red-500/50 focus-visible:ring-red-500/50' : ''}`}
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-2 top-1.5 h-8 w-8 p-0"
+                    className="absolute right-2 top-1.5 h-8 w-8 p-0 text-slate-400 hover:text-white"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
                     {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-sm text-destructive flex items-center">
+                  <p className="text-sm text-red-400 flex items-center">
                     <AlertTriangle className="h-4 w-4 mr-1" />
                     {errors.confirmPassword.message}
                   </p>
                 )}
               </div>
 
+              <Separator className="bg-slate-700" />
+
               {/* Enhanced Security Warning */}
-              <Alert className="border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription className="text-amber-800 dark:text-amber-200">
+              <Alert className="bg-gradient-to-r from-amber-950/50 to-orange-950/50 border-amber-500/30 backdrop-blur-sm">
+                <AlertTriangle className="h-4 w-4 text-amber-400" />
+                <AlertDescription className="text-amber-200">
                   <strong>Security Notice:</strong> Make sure you're in a secure environment. Your seed phrase and private key give full access to your wallet.
                 </AlertDescription>
               </Alert>
 
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={
-                  isLoading || 
+                  isLoading ||
                   (importType === 'mnemonic' ? !mnemonicValue?.trim() : !privateKeyValue?.trim())
                 }
-                className="w-full h-11 text-base font-medium"
+                className="w-full h-11 text-base font-medium bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 border-0 shadow-lg hover:shadow-xl"
                 size="lg"
               >
                 {isLoading ? (
@@ -298,9 +305,9 @@ export default function ImportWallet() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-slate-500">
                 Don't have a wallet yet?{' '}
-                <Link href="/create-wallet" className="text-primary hover:underline font-medium">
+                <Link href="/create-wallet" className="text-emerald-400 hover:text-emerald-300 font-medium hover:underline">
                   Create new wallet
                 </Link>
               </p>
