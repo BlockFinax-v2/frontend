@@ -1,6 +1,6 @@
 // Asset exports for consistent imports across the application
-import logoSvg from './logo.svg';
-import logoPng from './logo.png';
+import logoSvg from './logo.png';
+import logoPng from './blockFinax.png';
 
 // Default logo export (PNG for compatibility)
 export const logoPath = logoPng;

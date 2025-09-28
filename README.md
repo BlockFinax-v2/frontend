@@ -96,3 +96,45 @@ npm run build
 ```
 
 Built files will be in the `dist/` directory, ready to be served by any static hosting service.
+
+## Deployment
+
+### Vercel Deployment
+
+This project is configured for easy deployment on Vercel:
+
+1. **Connect Repository**: Link your GitHub repository to Vercel
+2. **Auto-deployment**: Vercel will automatically detect the configuration and deploy
+3. **Environment Variables**: Set the following environment variables in Vercel dashboard:
+   - `VITE_API_URL` - Your backend API URL (e.g., `https://your-api.vercel.app`)
+   - `VITE_WS_URL` - WebSocket URL for real-time updates
+   - `VITE_NETWORK` - Blockchain network (e.g., `mainnet`, `testnet`)
+   - `VITE_CHAIN_ID` - Blockchain chain ID
+
+4. **Build Settings** (should be auto-detected):
+   - **Framework Preset**: Vite
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+   - **Install Command**: `npm install`
+
+### Manual Deployment
+
+For other platforms, ensure your hosting service:
+- Serves static files from the `dist/` directory
+- Supports SPA routing (fallback to `index.html`)
+- Allows environment variables to be set
+- Has proper CORS configuration for API calls
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+```bash
+# API Configuration
+VITE_API_URL=https://your-api-domain.com
+VITE_WS_URL=wss://your-api-domain.com
+
+# Blockchain Configuration
+VITE_NETWORK=mainnet
+VITE_CHAIN_ID=1
+```

@@ -5,6 +5,7 @@ const WALLET_KEY = 'wallet_encrypted';
 const SETTINGS_KEY = 'wallet_settings';
 
 export interface StoredWallet {
+  displayName: string | null;
   address: string;
   name: string;
   encryptedPrivateKey: string;
